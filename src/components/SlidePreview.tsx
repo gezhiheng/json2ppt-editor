@@ -1,4 +1,85 @@
-import type { Slide } from "../types/ppt";
+import type { Slide, SlideElement } from "../types/ppt";
+
+const toPercent = (value: number, base: number) => `${(value / base) * 100}%`;
+
+function renderShape(shape: SlideElement & { path: string; viewBox?: number[] }) {
+  const viewWidth = shape.viewBox?.[0] ?? shape.width ?? 0;
+  const viewHeight = shape.viewBox?.[1] ?? shape.height ?? 0;
+  return (
+    <svg className="h-full w-full" viewBox={`0 0 ${viewWidth} ${viewHeight}`} preserveAspectRatio="none">
+      <path
+        d={shape.path}
+        fill={shape.fill || "transparent"}
+        stroke={shape.outline?.color}
+        strokeWidth={shape.outline?.width}
+      />
+    </svg>
+  );
+}
+
+function renderLine(line: SlideElement & { start: [number, number]; end: [number, number] }) {
+  const width = Math.max(Math.abs(line.end[0] - line.start[0]), 1);
+  const height = Math.max(Math.abs(line.end[1] - line.start[1]), 1);
+  return (
+    <svg className="h-full w-full" viewBox={`0 0 ${width} ${height}`}>
+      <line
+        x1={line.start[0]}
+        y1={line.start[1]}
+        x2={line.end[0]}
+        y2={line.end[1]}
+        stroke={line.color ?? "#000"}
+        strokeWidth={line.width ?? 1}
+      />
+    </svg>
+  );
+}
+
+function renderText(text: SlideElement & { content: string }) {
+  return (
+    <div
+      className="h-full w-full text-ink-900"
+      style={{ fontFamily: "Spline Sans, system-ui, sans-serif" }}
+      dangerouslySetInnerHTML={{ __html: text.content }}
+    />
+  );
+}
+
+function renderImage(image: SlideElement & { src: string }) {
+  const isEllipse = image.clip?.shape === "ellipse";
+  const grayscale = image.filters?.grayscale;
+  const opacity = image.filters?.opacity;
+  return (
+    <div
+      className={`h-full w-full overflow-hidden${isEllipse ? " rounded-full" : ""}`}
+      style={{
+        filter: grayscale ? "grayscale(1)" : undefined,
+        opacity: opacity ? Number(opacity) / 100 : undefined
+      }}
+    >
+      <img src={image.src} alt="" className="h-full w-full object-cover" />
+    </div>
+  );
+}
+
+function renderElement(element: SlideElement) {
+  if (element.type === "shape" && element.path) return renderShape(element);
+  if (element.type === "line" && element.start && element.end) return renderLine(element);
+  if (element.type === "text" && element.content) return renderText(element);
+  if (element.type === "image" && element.src) return renderImage(element);
+  return null;
+}
+
+function getElementSize(element: SlideElement): { width: number; height: number } {
+  if (element.type === "line" && element.start && element.end) {
+    const width = Math.max(Math.abs(element.end[0] - element.start[0]), 1);
+    const height = Math.max(Math.abs(element.end[1] - element.start[1]), 1);
+    return { width, height };
+  }
+  return {
+    width: element.width ?? 0,
+    height: element.height ?? 0
+  };
+}
 
 type SlidePreviewProps = {
   slide: Slide;
@@ -8,6 +89,7 @@ type SlidePreviewProps = {
   index: number;
   slideLabel: string;
   layoutLabel: string;
+  themeBackground?: string;
 };
 
 export function SlidePreview({
@@ -17,10 +99,10 @@ export function SlidePreview({
   previewWidth,
   index,
   slideLabel,
-  layoutLabel
+  layoutLabel,
+  themeBackground
 }: SlidePreviewProps): JSX.Element {
   const elements = slide.elements ?? [];
-  const backgroundColor = slide.background?.color ?? "#ffffff";
   const scale = previewWidth / baseWidth;
   const previewHeight = baseHeight * scale;
 
@@ -38,104 +120,34 @@ export function SlidePreview({
           style={{
             width: baseWidth,
             height: baseHeight,
-            background: backgroundColor,
             transform: `scale(${scale})`,
             transformOrigin: "top left"
           }}
         >
+          {themeBackground && (
+            <div className="absolute inset-0" style={{ backgroundColor: themeBackground }} />
+          )}
+          {slide.background?.color && (
+            <div className="absolute inset-0" style={{ backgroundColor: slide.background.color }} />
+          )}
           {elements.map((element) => {
-            const left = element.left ?? 0;
-            const top = element.top ?? 0;
-            const width = element.width ?? 0;
-            const height = element.height ?? 0;
-            const rotate = element.rotate ?? 0;
-            const transform = rotate ? `rotate(${rotate}deg)` : undefined;
-
-            if (element.type === "text") {
-              return (
-                <div
-                  key={element.id}
-                  className="slide-element absolute text-ink-900"
-                  style={{
-                    left,
-                    top,
-                    width,
-                    height,
-                    transform,
-                    fontFamily: "Spline Sans, system-ui, sans-serif",
-                    color: element.defaultColor ?? undefined
-                  }}
-                  dangerouslySetInnerHTML={{ __html: element.content ?? "" }}
-                />
-              );
-            }
-
-            if (element.type === "image") {
-              return (
-                <img
-                  key={element.id}
-                  className="slide-element absolute object-cover"
-                  src={element.src}
-                  alt="Slide asset"
-                  style={{
-                    left,
-                    top,
-                    width,
-                    height,
-                    transform
-                  }}
-                />
-              );
-            }
-
-            if (element.type === "line") {
-              const lineWidth = element.end?.[0] ?? element.width ?? 0;
-              const lineHeight = element.width ?? 1;
-              return (
-                <div
-                  key={element.id}
-                  className="slide-element absolute"
-                  style={{
-                    left,
-                    top,
-                    width: lineWidth,
-                    height: lineHeight,
-                    backgroundColor: element.color ?? "#000",
-                    transform
-                  }}
-                />
-              );
-            }
-
-            if (element.type === "shape") {
-              const isCircle = element.path?.includes("A 50 50") ?? false;
-              return (
-                <div
-                  key={element.id}
-                  className="slide-element absolute"
-                  style={{
-                    left,
-                    top,
-                    width,
-                    height,
-                    background: element.fill ?? "transparent",
-                    borderRadius: isCircle ? "9999px" : 0,
-                    border: element.outline?.color
-                      ? `${element.outline?.width ?? 1}px solid ${element.outline.color}`
-                      : undefined,
-                    opacity: element.opacity,
-                    boxShadow: element.shadow?.color
-                      ? `${element.shadow?.h ?? 0}px ${element.shadow?.v ?? 0}px ${
-                          element.shadow?.blur ?? 0
-                        }px ${element.shadow.color}`
-                      : undefined,
-                    transform
-                  }}
-                />
-              );
-            }
-
-            return null;
+            const size = getElementSize(element);
+            return (
+              <div
+                key={element.id}
+                className="absolute"
+                style={{
+                  left: toPercent(element.left ?? 0, baseWidth),
+                  top: toPercent(element.top ?? 0, baseHeight),
+                  width: toPercent(size.width, baseWidth),
+                  height: toPercent(size.height, baseHeight),
+                  transform: element.rotate ? `rotate(${element.rotate}deg)` : undefined,
+                  transformOrigin: "center"
+                }}
+              >
+                {renderElement(element)}
+              </div>
+            );
           })}
         </div>
       </div>

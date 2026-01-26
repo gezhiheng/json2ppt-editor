@@ -8,6 +8,7 @@ export type SlideElement = {
   rotate?: number;
   fill?: string;
   path?: string;
+  viewBox?: [number, number];
   opacity?: number;
   outline?: {
     width?: number;
@@ -22,6 +23,7 @@ export type SlideElement = {
   content?: string;
   defaultColor?: string;
   src?: string;
+  imageType?: string;
   start?: [number, number];
   end?: [number, number];
   color?: string;
@@ -29,6 +31,7 @@ export type SlideElement = {
     shape?: string;
   };
   filters?: {
+    grayscale?: string;
     opacity?: string;
   };
 };
@@ -49,6 +52,8 @@ export type Deck = {
   height?: number;
   slides?: Slide[];
   theme?: {
+    fontName?: string;
+    fontColor?: string;
     backgroundColor?: string;
   };
 };

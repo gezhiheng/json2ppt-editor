@@ -9,6 +9,7 @@ type PreviewPanelProps = {
   slideHeight: number;
   previewWidth: number;
   previewRef: RefObject<HTMLDivElement>;
+  themeBackground?: string;
 };
 
 export function PreviewPanel({
@@ -16,7 +17,8 @@ export function PreviewPanel({
   slideWidth,
   slideHeight,
   previewWidth,
-  previewRef
+  previewRef,
+  themeBackground
 }: PreviewPanelProps): JSX.Element {
   return (
     <section
@@ -44,6 +46,7 @@ export function PreviewPanel({
           index={index}
           slideLabel="Slide"
           layoutLabel="layout"
+          themeBackground={themeBackground}
         />
       ))}
     </section>

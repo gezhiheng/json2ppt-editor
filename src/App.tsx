@@ -3,7 +3,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { EditorPanel } from "./components/EditorPanel";
 import { HeaderBar } from "./components/HeaderBar";
 import { PreviewPanel } from "./components/PreviewPanel";
-import { buildPptx } from "./lib/pptx";
+import { buildPptx } from "./lib/json2pptx";
 import { findTemplateById, initialJson, initialTemplate, templateList, type TemplateEntry } from "./lib/templates";
 import type { Deck } from "./types/ppt";
 
@@ -116,6 +116,7 @@ export default function App(): JSX.Element {
             slideHeight={slideHeight}
             previewWidth={previewWidth}
             previewRef={previewRef}
+            themeBackground={deck?.theme?.backgroundColor}
           />
         </main>
       </div>
