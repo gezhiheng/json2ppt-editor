@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { Check, Copy } from 'lucide-react'
 import type { Slide, SlideElement } from '../types/ppt'
 
 const toPercent = (value: number, base: number) => `${(value / base) * 100}%`
@@ -116,9 +118,18 @@ export function SlidePreview ({
   layoutLabel,
   themeBackground
 }: SlidePreviewProps): JSX.Element {
+  const [copied, setCopied] = useState(false)
   const elements = slide.elements ?? []
   const scale = previewWidth / baseWidth
   const previewHeight = baseHeight * scale
+
+  const handleCopyId = () => {
+    if (slide.id) {
+      navigator.clipboard.writeText(slide.id)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1000)
+    }
+  }
 
   return (
     <div
@@ -128,9 +139,18 @@ export function SlidePreview ({
       <div className='flex items-center justify-between'>
         <div className='font-display text-sm uppercase tracking-[0.2em] text-ink-500'>
           {slide.id && (
-            <span className='ml-2 font-mono text-xs normal-case tracking-normal text-ink-400'>
-              {slide.id}
-            </span>
+            <button
+              className='group inline-flex items-center gap-1.5 rounded border border-transparent px-1.5 py-0.5 font-mono text-xs normal-case tracking-normal text-ink-400 transition-colors hover:border-ink-200 hover:bg-ink-100 hover:text-ink-700'
+              onClick={handleCopyId}
+              title='Click to copy slide ID'
+            >
+              <span>{slide.id}</span>
+              {copied ? (
+                <Check className='h-3 w-3' />
+              ) : (
+                <Copy className='h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100' />
+              )}
+            </button>
           )}
         </div>
         <div className='text-xs text-ink-500'>{slide.type ?? layoutLabel}</div>

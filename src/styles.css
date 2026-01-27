@@ -49,6 +49,11 @@ body::before {
   scrollbar-color: rgba(47, 38, 30, 0.4) transparent;
 }
 
+/* Monaco Editor Overrides */
+.monaco-editor .find-widget {
+  right: 48px !important;
+}
+
 .preview-scroll::-webkit-scrollbar {
   width: 8px;
 }
