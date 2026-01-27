@@ -1,4 +1,4 @@
-import { Button } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectValue
 } from './ui/select'
 import { cn } from '../lib/utils'
-import { LayoutTemplate, RotateCcw, FileJson, Presentation } from 'lucide-react'
+import { LayoutTemplate, RotateCcw, FileJson, Presentation, Github } from 'lucide-react'
 import type { Deck } from '../types/ppt'
 
 type TemplateEntry = {
@@ -79,6 +79,15 @@ export function HeaderBar ({
           <FileJson className='h-4 w-4' />
           导出 JSON
         </Button>
+        <a
+          href='https://github.com/gezhiheng/json2ppt-editor'
+          target='_blank'
+          rel='noopener noreferrer'
+          className={buttonVariants({ variant: 'ghost' })}
+        >
+          <Github className='h-4 w-4' />
+          GitHub
+        </a>
         <Button onClick={onExportPptx} disabled={isExporting}>
           <Presentation className='h-4 w-4' />
           {isExporting ? '导出中...' : '导出 PPTX'}
