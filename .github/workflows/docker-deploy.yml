@@ -84,5 +84,5 @@ jobs:
             docker rm "${{ env.CONTAINER_NAME }}" || true
             docker run -d --restart unless-stopped \
               --name "${{ env.CONTAINER_NAME }}" \
-              -p ${{ env.APP_PORT }}:80 \
+              -p ${{ env.APP_PORT }}:3010 \
               "${{ env.IMAGE_NAME }}:latest"
