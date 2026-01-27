@@ -7,7 +7,13 @@ import {
   SelectValue
 } from './ui/select'
 import { cn } from '../lib/utils'
-import { LayoutTemplate, RotateCcw, FileJson, Presentation, Github } from 'lucide-react'
+import {
+  LayoutTemplate,
+  RotateCcw,
+  FileJson,
+  Presentation,
+  Github
+} from 'lucide-react'
 import type { Deck } from '../types/ppt'
 
 type TemplateEntry = {
@@ -57,7 +63,7 @@ export function HeaderBar ({
       </div>
       <div className='flex flex-wrap items-center gap-3'>
         <Select value={selectedTemplateId} onValueChange={onTemplateChange}>
-          <SelectTrigger>
+          <SelectTrigger className='tracking-wider'>
             <div className='flex items-center gap-2'>
               <LayoutTemplate className='h-4 w-4' />
               <SelectValue placeholder='Choose' />
@@ -65,7 +71,11 @@ export function HeaderBar ({
           </SelectTrigger>
           <SelectContent>
             {templates.map(template => (
-              <SelectItem key={template.id} value={template.id}>
+              <SelectItem
+                className='tracking-wider'
+                key={template.id}
+                value={template.id}
+              >
                 {template.name}
               </SelectItem>
             ))}
