@@ -357,7 +357,6 @@ export function SlidePreview ({
             </button>
           )}
         </div>
-        <div className='text-xs text-ink-500'>{slide.type ?? layoutLabel}</div>
       </div>
       <div style={{ width: previewWidth, height: previewHeight }}>
         <div
