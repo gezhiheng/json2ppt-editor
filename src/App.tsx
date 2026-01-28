@@ -180,8 +180,8 @@ export default function App (): JSX.Element {
           >
             <div
               className={`h-8 w-1 rounded-full ${
-                isResizing ? 'bg-ink-400' : 'bg-ink-200'
-              } transition-colors group-hover:bg-ink-400`}
+                isResizing ? 'bg-ember-500' : 'bg-ink-200'
+              } transition-colors group-hover:bg-ember-500`}
             />
           </div>
 

@@ -58,7 +58,7 @@ export function HeaderBar ({
     <header className='flex flex-row justify-between rounded-xl border border-white/70 bg-white/70 p-6 shadow-soft backdrop-blur'>
       <div className='flex flex-col gap-2'>
         <h1 className='font-display text-3xl text-ink-900 md:text-4xl'>
-          Live JSON to PPTX editor
+          Live JSON <span className='text-ember-500'>to</span> PPTX editor
         </h1>
       </div>
       <div className='flex flex-wrap items-center gap-3'>

@@ -44,7 +44,12 @@ export function PreviewPanel ({
               )}
               onClick={() => setIsGrid(false)}
             >
-              <List className='h-4 w-4 text-ink-600' />
+              <List
+                className={cn(
+                  'h-4 w-4',
+                  !isGrid ? 'text-ember-500' : 'text-ink-600'
+                )}
+              />
             </Button>
             <Button
               variant='ghost'
@@ -56,7 +61,12 @@ export function PreviewPanel ({
               )}
               onClick={() => setIsGrid(true)}
             >
-              <LayoutGrid className='h-4 w-4 text-ink-600' />
+              <LayoutGrid
+                className={cn(
+                  'h-4 w-4',
+                  isGrid ? 'text-ember-500' : 'text-ink-600'
+                )}
+              />
             </Button>
           </div>
         </div>
