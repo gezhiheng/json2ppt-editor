@@ -4,6 +4,7 @@ A single-page app that turns JSON slide data into a live preview and exports PPT
 
 ## Features
 
+- Inspired by [PPTist](https://github.com/pipipi-pikachu/PPTist)
 - Live JSON editing with Monaco Editor and folding
 - Real-time slide preview
 - Export PPTX via PptxGenJS
@@ -43,6 +44,7 @@ npm run dev
 ### Choose a template
 
 Add JSON templates to `mock/` (e.g. `mock/template_2.json`). Restart the dev server to refresh the template list.
+Templates in this repo are sourced from [PPTist](https://github.com/pipipi-pikachu/PPTist).
 
 ### Export
 
