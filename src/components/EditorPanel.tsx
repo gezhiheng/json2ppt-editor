@@ -19,7 +19,7 @@ export function EditorPanel ({
   onChange
 }: EditorPanelProps): JSX.Element {
   return (
-    <section className='flex min-h-0 flex-col rounded-xl border border-ink-200/60 bg-[#1f1b16] p-5 shadow-sharp'>
+    <section className='h-full flex min-h-0 flex-col rounded-xl border border-ink-200/60 bg-[#1f1b16] p-5 shadow-sharp'>
       <div className='flex items-center justify-between'>
         <h2 className='font-display text-lg text-white'>JSON Editor</h2>
       </div>
