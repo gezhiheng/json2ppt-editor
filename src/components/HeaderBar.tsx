@@ -6,11 +6,9 @@ import {
   SelectTrigger,
   SelectValue
 } from './ui/select'
-import { cn } from '../lib/utils'
 import {
   LayoutTemplate,
   RotateCcw,
-  FileJson,
   Presentation,
   Github
 } from 'lucide-react'
@@ -33,25 +31,12 @@ type HeaderBarProps = {
   onExportPptx: () => void
 }
 
-function getStatusText (deck: Deck | null, jsonError: string): string {
-  if (jsonError) {
-    return `JSON error: ${jsonError}`
-  }
-  if (deck?.title) {
-    return `JSON valid · ${deck.title}`
-  }
-  return 'JSON valid'
-}
-
 export function HeaderBar ({
-  deck,
   templates,
   selectedTemplateId,
   isExporting,
-  jsonError,
   onTemplateChange,
   onResetTemplate,
-  onExportJson,
   onExportPptx
 }: HeaderBarProps): JSX.Element {
   return (
@@ -84,10 +69,6 @@ export function HeaderBar ({
         <Button onClick={onResetTemplate} variant='ghost'>
           <RotateCcw className='h-4 w-4' />
           重制模板
-        </Button>
-        <Button onClick={onExportJson} variant='ghost'>
-          <FileJson className='h-4 w-4' />
-          导出 JSON
         </Button>
         <a
           href='https://github.com/gezhiheng/json2ppt-editor'

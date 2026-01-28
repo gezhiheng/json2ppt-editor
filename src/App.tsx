@@ -170,7 +170,11 @@ export default function App (): JSX.Element {
             style={{ width: `${editorWidthPercent}%` }}
             className='flex h-full min-w-0 flex-col'
           >
-            <EditorPanel value={jsonText} onChange={setJsonText} />
+            <EditorPanel
+              value={jsonText}
+              onChange={setJsonText}
+              onDownload={handleExportJson}
+            />
           </div>
 
           {/* Resizer Handle */}
