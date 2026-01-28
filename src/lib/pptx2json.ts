@@ -1,7 +1,11 @@
 import JSZip from "jszip";
 
 import type { Deck, Slide, SlideElement } from "../types/ppt";
-import { PPTX_JSON_PAYLOAD_PATH, PPTX_JSON_PAYLOAD_VERSION } from "./json2pptx";
+import {
+  ENABLE_DECK_JSON,
+  PPTX_JSON_PAYLOAD_PATH,
+  PPTX_JSON_PAYLOAD_VERSION
+} from "./json2pptx";
 
 const EMU_PER_INCH = 914400;
 const PX_PER_INCH = 96;
@@ -266,33 +270,38 @@ async function buildFallbackDeck(zip: JSZip): Promise<ParsedResult> {
 
 export async function parsePptxToJson(file: File): Promise<ParsedResult> {
   const zip = await JSZip.loadAsync(await file.arrayBuffer());
-  const embedded = zip.file(PPTX_JSON_PAYLOAD_PATH);
-
-  if (embedded) {
-    const payloadText = await embedded.async("string");
-    try {
-      const parsed = JSON.parse(payloadText) as { version?: number; deck?: Deck } | Deck;
-      if ("deck" in parsed && parsed.deck) {
+  if (ENABLE_DECK_JSON) {
+    const embedded =
+      zip.file(PPTX_JSON_PAYLOAD_PATH) ??
+      Object.values(zip.files).find((entry) =>
+        entry.name.endsWith(`/${PPTX_JSON_PAYLOAD_PATH}`)
+      ) ??
+      null;
+    if (embedded) {
+      const payloadText = await embedded.async("string");
+      try {
+        const parsed = JSON.parse(payloadText) as { version?: number; deck?: Deck } | Deck;
+        if ("deck" in parsed && parsed.deck) {
+          return {
+            deck: parsed.deck,
+            warnings:
+              parsed.version && parsed.version !== PPTX_JSON_PAYLOAD_VERSION
+                ? [`Embedded JSON payload version ${parsed.version} differs from ${PPTX_JSON_PAYLOAD_VERSION}.`]
+                : []
+          };
+        }
+        return { deck: parsed as Deck, warnings: [] };
+      } catch {
+        const fallback = await buildFallbackDeck(zip);
         return {
-          deck: parsed.deck,
-          warnings:
-            parsed.version && parsed.version !== PPTX_JSON_PAYLOAD_VERSION
-              ? [`Embedded JSON payload version ${parsed.version} differs from ${PPTX_JSON_PAYLOAD_VERSION}.`]
-              : []
+          deck: fallback.deck,
+          warnings: [
+            "Embedded JSON payload could not be parsed. Falling back to PPTX parsing.",
+            ...fallback.warnings
+          ]
         };
       }
-      return { deck: parsed as Deck, warnings: [] };
-    } catch {
-      const fallback = await buildFallbackDeck(zip);
-      return {
-        deck: fallback.deck,
-        warnings: [
-          "Embedded JSON payload could not be parsed. Falling back to PPTX parsing.",
-          ...fallback.warnings
-        ]
-      };
     }
   }
-
   return buildFallbackDeck(zip);
 }
