@@ -1,4 +1,5 @@
 import PptxGenJS from "pptxgenjs";
+import JSZip from "jszip";
 
 import type { Deck, SlideElement } from "../types/ppt";
 import { resolveImageData } from "./pptx-shared";
@@ -6,6 +7,8 @@ import { resolveImageData } from "./pptx-shared";
 const PPTX_WIDTH = 13.33;
 const PPTX_HEIGHT = 7.5;
 const IMAGE_SIZE_CACHE = new Map<string, { width: number; height: number }>();
+export const PPTX_JSON_PAYLOAD_PATH = "json2ppt-editor.json";
+export const PPTX_JSON_PAYLOAD_VERSION = 1;
 
 function sanitizeFileName(name: string): string {
   return name.replace(/[\\/:*?"<>|]/g, "").trim() || "presentation";
@@ -252,7 +255,29 @@ async function addElement(
   }
 }
 
-export async function buildPptx(template: Deck): Promise<void> {
+function buildJsonPayload(template: Deck): string {
+  return JSON.stringify(
+    {
+      version: PPTX_JSON_PAYLOAD_VERSION,
+      deck: template
+    },
+    null,
+    2
+  );
+}
+
+async function embedJsonPayload(
+  pptxBuffer: ArrayBuffer,
+  template: Deck
+): Promise<Blob> {
+  const zip = await JSZip.loadAsync(pptxBuffer);
+  zip.file(PPTX_JSON_PAYLOAD_PATH, buildJsonPayload(template));
+  return zip.generateAsync({ type: "blob" });
+}
+
+export async function buildPptxBlob(
+  template: Deck
+): Promise<{ blob: Blob; fileName: string }> {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.author = "Shangtie Smart PPT";
@@ -279,5 +304,10 @@ export async function buildPptx(template: Deck): Promise<void> {
   }
 
   const fileName = `${sanitizeFileName(template.title ?? "presentation")}.pptx`;
-  await pptx.writeFile({ fileName });
+  const pptxBuffer = (await pptx.write({
+    outputType: "arraybuffer",
+    compression: true
+  })) as ArrayBuffer;
+  const blob = await embedJsonPayload(pptxBuffer, template);
+  return { blob, fileName };
 }
