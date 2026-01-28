@@ -1,5 +1,5 @@
-import { useState, type RefObject } from 'react'
-import { LayoutGrid, List } from 'lucide-react'
+import { useRef, useState, type RefObject } from 'react'
+import { Download, LayoutGrid, List, Upload } from 'lucide-react'
 
 import { SlidePreview } from './SlidePreview'
 import type { Deck, Slide } from '../types/ppt'
@@ -13,6 +13,10 @@ type PreviewPanelProps = {
   previewWidth: number
   previewRef: RefObject<HTMLDivElement>
   themeBackground?: string
+  isImporting: boolean
+  isExporting: boolean
+  onImportPptx: (file: File) => void
+  onExportPptx: () => void
 }
 
 export function PreviewPanel ({
@@ -21,9 +25,27 @@ export function PreviewPanel ({
   slideHeight,
   previewWidth,
   previewRef,
-  themeBackground
+  themeBackground,
+  isImporting,
+  isExporting,
+  onImportPptx,
+  onExportPptx
 }: PreviewPanelProps): JSX.Element {
   const [isGrid, setIsGrid] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const toolButtonClass =
+    'h-8 px-2 text-ink-600 hover:text-ink-900 disabled:text-ink-400'
+
+  function handleUploadClick (): void {
+    fileInputRef.current?.click()
+  }
+
+  function handleFileChange (event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    onImportPptx(file)
+    event.target.value = ''
+  }
 
   return (
     <section
@@ -31,7 +53,7 @@ export function PreviewPanel ({
       className='h-full preview-scroll flex min-h-0 flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-xl border border-white/70 bg-white/80 px-6 pb-6 pt-0 shadow-soft backdrop-blur'
     >
       <div className='sticky top-0 z-10 -mx-6 flex items-center justify-between bg-white/80 px-6 pb-4 pt-6 backdrop-blur'>
-        <div className='flex items-center gap-4'>
+        <div className='flex items-center gap-2'>
           <h2 className='font-display text-lg text-ink-900'>Slide Preview</h2>
           <div className='flex items-center gap-1 rounded-lg border border-ink-100 bg-ink-50 p-1'>
             <Button
@@ -69,8 +91,33 @@ export function PreviewPanel ({
               />
             </Button>
           </div>
+          <input
+            ref={fileInputRef}
+            type='file'
+            accept='.pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            className='hidden'
+            onChange={handleFileChange}
+          />
+          <Button
+            variant='secondary'
+            size='sm'
+            className={toolButtonClass}
+            onClick={handleUploadClick}
+            disabled={isExporting || isImporting}
+          >
+            <Download className='h-4 w-4' />
+          </Button>
+          <Button
+            variant='secondary'
+            size='sm'
+            className={toolButtonClass}
+            onClick={onExportPptx}
+            disabled={isExporting || isImporting}
+          >
+            <Upload className='h-4 w-4' />
+          </Button>
         </div>
-        <div className='text-xs uppercase tracking-[0.2em] text-ink-500'>
+        <div className='text-xs uppercase tracking-wider text-ink-500'>
           {deck?.slides?.length ?? 0} slides
         </div>
       </div>

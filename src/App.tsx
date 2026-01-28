@@ -3,7 +3,8 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorPanel } from './components/EditorPanel'
 import { HeaderBar } from './components/HeaderBar'
 import { PreviewPanel } from './components/PreviewPanel'
-import { buildPptx } from './lib/json2pptx'
+import { buildPptxBlob } from './lib/json2pptx'
+import { parsePptxToJson } from './lib/pptx2json'
 import {
   findTemplateById,
   initialJson,
@@ -38,9 +39,19 @@ function buildDownload (jsonText: string, fileName: string): void {
   URL.revokeObjectURL(url)
 }
 
+function downloadBlob (blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 export default function App (): JSX.Element {
   const [jsonText, setJsonText] = useState(initialJson)
-  const [exporting, setExporting] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
   const [previewWidth, setPreviewWidth] = useState(720)
   const [selectedTemplateId, setSelectedTemplateId] = useState(
     initialTemplate?.id ?? ''
@@ -134,17 +145,31 @@ export default function App (): JSX.Element {
       alert('JSON parse error. Fix the JSON before exporting.')
       return
     }
-    setExporting(true)
+    setIsExporting(true)
     try {
-      await buildPptx(current.data)
+      const { blob, fileName } = await buildPptxBlob(current.data)
+      downloadBlob(blob, fileName)
     } finally {
-      setExporting(false)
+      setIsExporting(false)
     }
   }
 
   function handleExportJson (): void {
     const fileName = `${deck?.title ?? 'json2ppt'}.json`
     buildDownload(jsonText, fileName)
+  }
+
+  async function handleImportPptx (file: File): Promise<void> {
+    setIsImporting(true)
+    try {
+      const { deck: importedDeck, warnings } = await parsePptxToJson(file)
+      setJsonText(JSON.stringify(importedDeck, null, 2))
+      if (warnings.length) {
+        alert(warnings.join('\n'))
+      }
+    } finally {
+      setIsImporting(false)
+    }
   }
 
   return (
@@ -154,12 +179,9 @@ export default function App (): JSX.Element {
           deck={deck}
           templates={templateList}
           selectedTemplateId={selectedTemplate?.id ?? ''}
-          isExporting={exporting}
           jsonError={parsed.error}
           onTemplateChange={applyTemplate}
           onResetTemplate={() => applyTemplate(selectedTemplate?.id ?? '')}
-          onExportJson={handleExportJson}
-          onExportPptx={handleExportPptx}
         />
 
         <main
@@ -197,6 +219,10 @@ export default function App (): JSX.Element {
               previewWidth={previewWidth}
               previewRef={previewRef}
               themeBackground={deck?.theme?.backgroundColor}
+              isExporting={isExporting}
+              isImporting={isImporting}
+              onImportPptx={handleImportPptx}
+              onExportPptx={handleExportPptx}
             />
           </div>
         </main>
