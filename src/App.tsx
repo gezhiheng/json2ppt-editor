@@ -48,6 +48,42 @@ function downloadBlob (blob: Blob, fileName: string): void {
   URL.revokeObjectURL(url)
 }
 
+const ID_CHARS =
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+function generateSlideId (existing: Set<string>): string {
+  const withDash = Math.random() < 0.5
+  const segments = withDash ? [5, 5] : [10]
+  let id = ''
+  for (let s = 0; s < segments.length; s += 1) {
+    const segmentLength = segments[s]
+    const bytes = new Uint32Array(segmentLength)
+    crypto.getRandomValues(bytes)
+    for (let i = 0; i < segmentLength; i += 1) {
+      id += ID_CHARS[bytes[i] % ID_CHARS.length]
+    }
+    if (withDash && s === 0) id += '-'
+  }
+  if (!existing.has(id)) return id
+  return generateSlideId(existing)
+}
+
+function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
+  if (!deck.slides?.length) return { deck, changed: false }
+  let changed = false
+  const existing = new Set<string>(
+    deck.slides.map((slide) => slide.id).filter(Boolean) as string[]
+  )
+  const slides = deck.slides.map((slide) => {
+    if (slide.id) return slide
+    changed = true
+    const id = generateSlideId(existing)
+    existing.add(id)
+    return { ...slide, id }
+  })
+  return changed ? { deck: { ...deck, slides }, changed } : { deck, changed }
+}
+
 export default function App (): JSX.Element {
   const [jsonText, setJsonText] = useState(initialJson)
   const [isExporting, setIsExporting] = useState(false)
@@ -66,6 +102,11 @@ export default function App (): JSX.Element {
 
   const parsed = useMemo(() => safeParse(deferredJsonText), [deferredJsonText])
   const deck = parsed.data
+  const normalized = useMemo(
+    () => (deck ? ensureSlideIds(deck) : { deck: null, changed: false }),
+    [deck]
+  )
+  const normalizedDeck = normalized.deck
   const slideWidth = deck?.width ?? 1000
   const slideHeight = deck?.height ?? 562.5
 
@@ -110,6 +151,13 @@ export default function App (): JSX.Element {
     }
   }, [slideWidth])
 
+  useEffect(() => {
+    if (!deck || parsed.error) return
+    const { deck: updated, changed } = ensureSlideIds(deck)
+    if (!changed) return
+    setJsonText(JSON.stringify(updated, null, 2))
+  }, [deck, parsed.error])
+
   // Handle Split Resizing
   useEffect(() => {
     if (!isResizing) return
@@ -145,9 +193,13 @@ export default function App (): JSX.Element {
       alert('JSON parse error. Fix the JSON before exporting.')
       return
     }
+    const normalizedExport = ensureSlideIds(current.data)
+    if (normalizedExport.changed) {
+      setJsonText(JSON.stringify(normalizedExport.deck, null, 2))
+    }
     setIsExporting(true)
     try {
-      const { blob, fileName } = await buildPptxBlob(current.data)
+      const { blob, fileName } = await buildPptxBlob(normalizedExport.deck)
       downloadBlob(blob, fileName)
     } finally {
       setIsExporting(false)
@@ -213,7 +265,7 @@ export default function App (): JSX.Element {
 
           <div className='flex h-full min-w-0 flex-1 flex-col'>
             <PreviewPanel
-              deck={deck}
+              deck={normalizedDeck}
               slideWidth={slideWidth}
               slideHeight={slideHeight}
               previewWidth={previewWidth}
