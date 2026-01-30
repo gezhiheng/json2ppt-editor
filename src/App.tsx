@@ -68,6 +68,15 @@ function generateSlideId (existing: Set<string>): string {
   return generateSlideId(existing)
 }
 
+function reorderSlideIdFirst (slide: Deck['slides'][number], id: string) {
+  const ordered: Record<string, unknown> = { id }
+  for (const key of Object.keys(slide)) {
+    if (key === 'id') continue
+    ordered[key] = (slide as Record<string, unknown>)[key]
+  }
+  return ordered as Deck['slides'][number]
+}
+
 function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
   if (!deck.slides?.length) return { deck, changed: false }
   let changed = false
@@ -75,11 +84,16 @@ function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
     deck.slides.map((slide) => slide.id).filter(Boolean) as string[]
   )
   const slides = deck.slides.map((slide) => {
-    if (slide.id) return slide
-    changed = true
-    const id = generateSlideId(existing)
-    existing.add(id)
-    return { ...slide, id }
+    const hasId = Boolean(slide.id)
+    const id = slide.id ?? generateSlideId(existing)
+    const firstKey = Object.keys(slide)[0]
+    const needsReorder = firstKey !== 'id'
+    if (!hasId || needsReorder) {
+      changed = true
+      existing.add(id)
+      return reorderSlideIdFirst(slide, id)
+    }
+    return slide
   })
   return changed ? { deck: { ...deck, slides }, changed } : { deck, changed }
 }
