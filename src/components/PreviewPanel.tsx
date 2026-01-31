@@ -52,7 +52,7 @@ export function PreviewPanel ({
       ref={previewRef}
       className='h-full preview-scroll flex min-h-0 flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-xl border border-white/70 bg-white/80 px-6 pb-6 pt-0 shadow-soft backdrop-blur'
     >
-      <div className='sticky top-0 z-10 -mx-6 flex items-center justify-between bg-white/80 px-6 pb-4 pt-6 backdrop-blur'>
+      <div className='sticky top-0 z-10 -mx-6 flex items-center justify-between bg-white px-6 pb-4 pt-6'>
         <div className='flex items-center gap-2'>
           <h2 className='font-display text-lg text-ink-900'>Slide Preview</h2>
           <div className='flex items-center gap-1 rounded-lg border border-ink-100 bg-ink-50 p-1'>
