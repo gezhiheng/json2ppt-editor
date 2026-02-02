@@ -45,7 +45,7 @@ export function eachElement<T>(
   node: XmlNode,
   func: (value: XmlNode, index: number) => T
 ): string {
-  if (!node) return node
+  if (!node) return ''
 
   let result = ''
   if (node.constructor === Array) {
@@ -75,18 +75,18 @@ export function getTextByPathList(node: XmlNode, path: Array<string>): XmlNode {
 
 export function angleToDegrees(angle?: number | string | null): number {
   if (!angle) return 0
-  return Math.round(angle / 60000)
+  return Math.round(Number(angle) / 60000)
 }
 
 export function escapeHtml(text: string): string {
-  const map = {
+  const map: Record<string, string> = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
     '"': '&quot;',
     "'": '&#039;',
   }
-  return text.replace(/[&<>"']/g, m => map[m])
+  return text.replace(/[&<>"']/g, m => map[m] || m)
 }
 
 export function getMimeType(imgFileExt: string): string {

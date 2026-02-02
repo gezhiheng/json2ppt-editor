@@ -30,7 +30,7 @@ function shapePie(H: any, w: any, adj1: any, adj2: any, isClose: any) {
 
   return d
 }
-function shapeGear(h: any, points: any) {
+function shapeGear(_w: any, h: any, points: any) {
   const innerRadius = h
   const outerRadius = 1.5 * innerRadius
   const cx = outerRadius
@@ -2149,7 +2149,8 @@ export function getShapePath(shapType: any, w: any, h: any, node: any) {
         ]
 
         for (const arcParams of arcs) {
-          const arcPath = getArc(lastPoint[0], lastPoint[1], ...arcParams)
+          const [rX, rY, sA, wA] = arcParams as [any, any, any, any]
+          const arcPath = getArc(lastPoint[0], lastPoint[1], rX, rY, sA, wA)
           cloudPath += arcPath
           const lastL = arcPath.lastIndexOf('L')
           const coords = arcPath.substring(lastL + 1).split(' ')

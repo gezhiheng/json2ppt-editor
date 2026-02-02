@@ -1,10 +1,10 @@
 import { getTextByPathList } from './utils'
 import { getShadow } from './shadow'
 import { getFillType, getGradientFill, getSolidFill } from './fill'
-import type { AnyRecord, XmlNode } from './types'
+import type { AnyRecord } from './types'
 
 export function getFontType(node: AnyRecord, type: string, warpObj: AnyRecord, slideLayoutSpNode: AnyRecord, slideMasterSpNode: AnyRecord, slideMasterTextStyles: AnyRecord): string {
-  const extractFont = (targetNode: AnyRecord, isDirectRun = false): XmlNode => {
+  const extractFont = (targetNode: AnyRecord, isDirectRun = false): any => {
     if (!targetNode) return null
     
     let rPr
@@ -72,7 +72,7 @@ export function getFontType(node: AnyRecord, type: string, warpObj: AnyRecord, s
   return typeface ? String(typeface) : ''
 }
 
-export function getFontColor(node: AnyRecord, pNode: AnyRecord, lstStyle: AnyRecord, pFontStyle: AnyRecord, lvl: number, warpObj: AnyRecord): AnyRecord | null {
+export function getFontColor(node: AnyRecord, pNode: AnyRecord, lstStyle: AnyRecord, pFontStyle: AnyRecord, lvl: number, warpObj: AnyRecord): any {
   const rPrNode = getTextByPathList(node, ['a:rPr'])
   let filTyp, color
   if (rPrNode) {
@@ -103,8 +103,8 @@ export function getFontColor(node: AnyRecord, pNode: AnyRecord, lstStyle: AnyRec
   return color || ''
 }
 
-export function getFontSize(node: AnyRecord, slideLayoutSpNode: AnyRecord, type: string, slideMasterTextStyles: AnyRecord, textBodyNode: AnyRecord, pNode: AnyRecord): number | null {
-  let fontSize
+export function getFontSize(node: AnyRecord, slideLayoutSpNode: AnyRecord, type: string, slideMasterTextStyles: AnyRecord, textBodyNode: AnyRecord, pNode: AnyRecord): string {
+  let fontSize: any
 
   if (getTextByPathList(node, ['a:rPr', 'attrs', 'sz'])) fontSize = getTextByPathList(node, ['a:rPr', 'attrs', 'sz']) / 100
 
@@ -173,34 +173,34 @@ export function getFontSize(node: AnyRecord, slideLayoutSpNode: AnyRecord, type:
   return fontSize + 'pt'
 }
 
-export function getFontBold(node: AnyRecord): boolean {
+export function getFontBold(node: AnyRecord): string {
   return getTextByPathList(node, ['a:rPr', 'attrs', 'b']) === '1' ? 'bold' : ''
 }
 
-export function getFontItalic(node: AnyRecord): boolean {
+export function getFontItalic(node: AnyRecord): string {
   return getTextByPathList(node, ['a:rPr', 'attrs', 'i']) === '1' ? 'italic' : ''
 }
 
-export function getFontDecoration(node: AnyRecord): boolean {
+export function getFontDecoration(node: AnyRecord): string {
   return getTextByPathList(node, ['a:rPr', 'attrs', 'u']) === 'sng' ? 'underline' : ''
 }
 
-export function getFontDecorationLine(node: AnyRecord): boolean {
+export function getFontDecorationLine(node: AnyRecord): string {
   return getTextByPathList(node, ['a:rPr', 'attrs', 'strike']) === 'sngStrike' ? 'line-through' : ''
 }
 
-export function getFontSpace(node: AnyRecord): number {
+export function getFontSpace(node: AnyRecord): string {
   const spc = getTextByPathList(node, ['a:rPr', 'attrs', 'spc'])
   return spc ? (parseInt(String(spc)) / 100 + 'pt') : ''
 }
 
-export function getFontSubscript(node: AnyRecord): string | null {
+export function getFontSubscript(node: AnyRecord): string {
   const baseline = getTextByPathList(node, ['a:rPr', 'attrs', 'baseline'])
   if (!baseline) return ''
   return parseInt(String(baseline)) > 0 ? 'super' : 'sub'
 }
 
-export function getFontShadow(node: AnyRecord, warpObj: AnyRecord): AnyRecord | null {
+export function getFontShadow(node: AnyRecord, warpObj: AnyRecord): string {
   const txtShadow = getTextByPathList(node, ['a:rPr', 'a:effectLst', 'a:outerShdw'])
   if (txtShadow) {
     const shadow = getShadow(txtShadow, warpObj)

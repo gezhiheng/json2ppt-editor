@@ -3,7 +3,7 @@ import { getTextByPathList } from './utils'
 import { getBorder } from './border'
 
 export function getTableBorders(node: any, warpObj: any) {
-  const borders = {}
+  const borders: any = {}
   if (node['a:bottom']) {
     const obj = {
       'p:spPr': {
@@ -55,9 +55,9 @@ export async function getTableCellParams(tcNode: any, thisTblStyle: any, cellSou
   const getCelFill = getTextByPathList(tcNode, ['a:tcPr'])
   if (getCelFill) {
     const cellObj = { 'p:spPr': getCelFill }
-    const fill = await getShapeFill(cellObj, undefined, false, warpObj, 'slide')
+    const fill = await getShapeFill(cellObj, undefined, false, warpObj, 'slide') as any
 
-    if (fill && fill.type === 'color' && fill.value) {
+    if (fill && typeof fill === 'object' && fill.type === 'color' && fill.value) {
       fillColor = fill.value 
     }
   }
@@ -97,7 +97,7 @@ export async function getTableCellParams(tcNode: any, thisTblStyle: any, cellSou
     if (!lin_right) lin_right = getTextByPathList(thisTblStyle, ['a:wholeTbl', 'a:tcStyle', 'a:tcBdr', 'a:right', 'a:ln'])
   }
 
-  const borders = {}
+  const borders: any = {}
   if (lin_bottm) borders.bottom = getBorder(lin_bottm, undefined, warpObj)
   if (lin_top) borders.top = getBorder(lin_top, undefined, warpObj)
   if (lin_left) borders.left = getBorder(lin_left, undefined, warpObj)

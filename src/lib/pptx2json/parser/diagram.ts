@@ -1,7 +1,7 @@
 import { getTextByPathList } from './utils'
 
 export function getSmartArtTextData(dataContent: any) {
-  const result = []
+  const result: string[] = []
 
   let ptLst = getTextByPathList(dataContent, ['dgm:dataModel', 'dgm:ptLst', 'dgm:pt'])
 
@@ -18,12 +18,12 @@ export function getSmartArtTextData(dataContent: any) {
       if (paragraphs) {
         if (!Array.isArray(paragraphs)) paragraphs = [paragraphs]
 
-        paragraphs.forEach(p => {
+        paragraphs.forEach((p: any) => {
           let runs = getTextByPathList(p, ['a:r'])
           if (runs) {
             if (!Array.isArray(runs)) runs = [runs]
 
-            runs.forEach(r => {
+            runs.forEach((r: any) => {
               const t = getTextByPathList(r, ['a:t'])
               if (t && typeof t === 'string') nodeText += t
             })

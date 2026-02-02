@@ -10,7 +10,7 @@ type BorderResult = {
   strokeDasharray: string
 }
 
-export function getBorder(node: XmlNode, elType: string, warpObj: AnyRecord): BorderResult {
+export function getBorder(node: XmlNode, elType?: string, warpObj: AnyRecord = {} as AnyRecord): BorderResult {
   let lineNode = getTextByPathList(node, ['p:spPr', 'a:ln'])
   if (!lineNode) {
     const lnRefNode = getTextByPathList(node, ['p:style', 'a:lnRef'])
@@ -30,7 +30,8 @@ export function getBorder(node: XmlNode, elType: string, warpObj: AnyRecord): Bo
     else borderWidth = 1
   }
 
-  let borderColor = getTextByPathList(lineNode, ['a:solidFill', 'a:srgbClr', 'attrs', 'val'])
+  let borderColorNode = getTextByPathList(lineNode, ['a:solidFill', 'a:srgbClr', 'attrs', 'val'])
+  let borderColor = (typeof borderColorNode === 'string') ? borderColorNode : undefined
   if (!borderColor) {
     const schemeClrNode = getTextByPathList(lineNode, ['a:solidFill', 'a:schemeClr'])
     const schemeClr = 'a:' + String(getTextByPathList(schemeClrNode, ['attrs', 'val']))
@@ -57,7 +58,8 @@ export function getBorder(node: XmlNode, elType: string, warpObj: AnyRecord): Bo
   if (!borderColor) borderColor = '#000000'
   else borderColor = `#${borderColor}`
 
-  const type = getTextByPathList(lineNode, ['a:prstDash', 'attrs', 'val'])
+  const typeNode = getTextByPathList(lineNode, ['a:prstDash', 'attrs', 'val'])
+  const type = (typeof typeNode === 'string') ? typeNode : undefined
   let borderType = 'solid'
   let strokeDasharray = '0'
   switch (type) {

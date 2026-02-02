@@ -15,6 +15,7 @@ export type SlideElement = {
   keypoints?: number[];
   special?: boolean;
   opacity?: number;
+  fixedRatio?: boolean;
   outline?: {
     width?: number;
     color?: string;
@@ -76,6 +77,7 @@ export type SlideElement = {
     defaultColor?: string;
     defaultFontName?: string;
     align?: string;
+    lineHeight?: number;
   };
 };
 

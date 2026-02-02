@@ -63,7 +63,7 @@ export async function getPicFill(type: any, node: any, warpObj: any) {
     if (imgExt === 'xml') return ''
 
     const imgArrayBuffer = await warpObj['zip'].file(imgPath).async('arraybuffer')
-    const imgMimeType = getMimeType(imgExt)
+    const imgMimeType = getMimeType(imgExt || '')
     img = `data:${imgMimeType};base64,${base64ArrayBuffer(imgArrayBuffer)}`
 
     const loadedImages = warpObj['loaded-images'] || {}
@@ -91,7 +91,7 @@ export function getPicFilters(node: any) {
   const aBlipNode = node['a:blip']
   if (!aBlipNode) return null
 
-  const filters = {}
+  const filters: Record<string, number> = {}
 
   // 从a:extLst中获取滤镜效果（Microsoft Office 2010+扩展）
   const extLstNode = aBlipNode['a:extLst']
@@ -113,7 +113,7 @@ export function getPicFilters(node: any) {
         if (effect['a14:saturation']) {
           const satAttr = getTextByPathList(effect, ['a14:saturation', 'attrs', 'sat'])
           if (satAttr) {
-            filters.saturation = parseInt(satAttr) / 100000
+            filters.saturation = parseInt(String(satAttr)) / 100000
           }
         }
 
@@ -123,10 +123,10 @@ export function getPicFilters(node: any) {
           const contrastAttr = getTextByPathList(effect, ['a14:brightnessContrast', 'attrs', 'contrast'])
 
           if (brightAttr) {
-            filters.brightness = parseInt(brightAttr) / 100000
+            filters.brightness = parseInt(String(brightAttr)) / 100000
           }
           if (contrastAttr) {
-            filters.contrast = parseInt(contrastAttr) / 100000
+            filters.contrast = parseInt(String(contrastAttr)) / 100000
           }
         }
 
@@ -134,7 +134,7 @@ export function getPicFilters(node: any) {
         if (effect['a14:sharpenSoften']) {
           const amountAttr = getTextByPathList(effect, ['a14:sharpenSoften', 'attrs', 'amount'])
           if (amountAttr) {
-            const amount = parseInt(amountAttr) / 100000
+            const amount = parseInt(String(amountAttr)) / 100000
             if (amount > 0) {
               filters.sharpen = amount
             }
@@ -148,7 +148,7 @@ export function getPicFilters(node: any) {
         if (effect['a14:colorTemperature']) {
           const tempAttr = getTextByPathList(effect, ['a14:colorTemperature', 'attrs', 'colorTemp'])
           if (tempAttr) {
-            filters.colorTemperature = parseInt(tempAttr)
+            filters.colorTemperature = parseInt(String(tempAttr))
           }
         }
       }
@@ -273,7 +273,7 @@ export async function getSlideBackgroundFill(warpObj: any) {
   let bgPr = getTextByPathList(slideContent, ['p:sld', 'p:cSld', 'p:bg', 'p:bgPr'])
   let bgRef = getTextByPathList(slideContent, ['p:sld', 'p:cSld', 'p:bg', 'p:bgRef'])
 
-  let background = '#fff'
+  let background: any = '#fff'
   let backgroundType = 'color'
 
   if (bgPr) {
@@ -329,13 +329,13 @@ export async function getSlideBackgroundFill(warpObj: any) {
     if (idx > 1000) {
       const trueIdx = idx - 1000
       const bgFillLst = warpObj['themeContent']['a:theme']['a:themeElements']['a:fmtScheme']['a:bgFillStyleLst']
-      const sortblAry = []
+      const sortblAry: any[] = []
       Object.keys(bgFillLst).forEach(key => {
         const bgFillLstTyp = bgFillLst[key]
         if (key !== 'attrs') {
           if (bgFillLstTyp.constructor === Array) {
             for (let i = 0; i < bgFillLstTyp.length; i++) {
-              const obj = {}
+              const obj: any = {}
               obj[key] = bgFillLstTyp[i]
               if (bgFillLstTyp[i]['attrs']) {
                 obj['idex'] = bgFillLstTyp[i]['attrs']['order']
@@ -347,7 +347,7 @@ export async function getSlideBackgroundFill(warpObj: any) {
             }
           } 
           else {
-            const obj = {}
+            const obj: any = {}
             obj[key] = bgFillLstTyp
             if (bgFillLstTyp['attrs']) {
               obj['idex'] = bgFillLstTyp['attrs']['order']
@@ -425,13 +425,13 @@ export async function getSlideBackgroundFill(warpObj: any) {
       if (idx > 1000) {
         const trueIdx = idx - 1000
         const bgFillLst = warpObj['themeContent']['a:theme']['a:themeElements']['a:fmtScheme']['a:bgFillStyleLst']
-        const sortblAry = []
+        const sortblAry: any[] = []
         Object.keys(bgFillLst).forEach(key => {
           const bgFillLstTyp = bgFillLst[key]
           if (key !== 'attrs') {
             if (bgFillLstTyp.constructor === Array) {
               for (let i = 0; i < bgFillLstTyp.length; i++) {
-                const obj = {}
+                const obj: any = {}
                 obj[key] = bgFillLstTyp[i]
                 if (bgFillLstTyp[i]['attrs']) {
                   obj['idex'] = bgFillLstTyp[i]['attrs']['order']
@@ -443,7 +443,7 @@ export async function getSlideBackgroundFill(warpObj: any) {
               }
             } 
             else {
-              const obj = {}
+              const obj: any = {}
               obj[key] = bgFillLstTyp
               if (bgFillLstTyp['attrs']) {
                 obj['idex'] = bgFillLstTyp['attrs']['order']
@@ -528,13 +528,13 @@ export async function getSlideBackgroundFill(warpObj: any) {
         if (idx > 1000) {
           const trueIdx = idx - 1000
           const bgFillLst = warpObj['themeContent']['a:theme']['a:themeElements']['a:fmtScheme']['a:bgFillStyleLst']
-          const sortblAry = []
+          const sortblAry: any[] = []
           Object.keys(bgFillLst).forEach(key => {
             const bgFillLstTyp = bgFillLst[key]
             if (key !== 'attrs') {
               if (bgFillLstTyp.constructor === Array) {
                 for (let i = 0; i < bgFillLstTyp.length; i++) {
-                  const obj = {}
+                  const obj: any = {}
                   obj[key] = bgFillLstTyp[i]
                   if (bgFillLstTyp[i]['attrs']) {
                     obj['idex'] = bgFillLstTyp[i]['attrs']['order']
@@ -546,7 +546,7 @@ export async function getSlideBackgroundFill(warpObj: any) {
                 }
               } 
               else {
-                const obj = {}
+                const obj: any = {}
                 obj[key] = bgFillLstTyp
                 if (bgFillLstTyp['attrs']) {
                   obj['idex'] = bgFillLstTyp['attrs']['order']
@@ -601,7 +601,7 @@ export async function getSlideBackgroundFill(warpObj: any) {
 export async function getShapeFill(node: any, pNode: any, isSvgMode: any, warpObj: any, source: any, groupHierarchy: any = []) {
   const fillType = getFillType(getTextByPathList(node, ['p:spPr']))
   let type = 'color'
-  let fillValue = ''
+  let fillValue: any = ''
   if (fillType === 'NO_FILL') {
     return isSvgMode ? 'none' : ''
   } 
@@ -730,7 +730,7 @@ export function getSolidFill(solidFill: any, clrMap: any, phClr: any, warpObj: a
   else if (solidFill['a:prstClr']) {
     clrNode = solidFill['a:prstClr']
     const prstClr = getTextByPathList(clrNode, ['attrs', 'val'])
-    color = getColorName2Hex(prstClr)
+    color = getColorName2Hex(prstClr) || ''
   } 
   else if (solidFill['a:hslClr']) {
     clrNode = solidFill['a:hslClr']

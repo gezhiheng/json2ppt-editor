@@ -52,16 +52,16 @@ export function getCustomShapePath(custShapType: any, w: any, h: any) {
   let closeNode = getTextByPathList(pathNodes, ['a:close'])
   if (!Array.isArray(moveToNode)) moveToNode = [moveToNode]
 
-  const multiSapeAry = []
+  const multiSapeAry: any[] = []
   if (moveToNode.length > 0) {
     Object.keys(moveToNode).forEach(key => {
       const moveToPtNode = moveToNode[key]['a:pt']
       if (moveToPtNode) {
         Object.keys(moveToPtNode).forEach(key => {
           const moveToNoPt = moveToPtNode[key]
-          const spX = moveToNoPt['attrs', 'x']
-          const spY = moveToNoPt['attrs', 'y']
-          const order = moveToNoPt['attrs', 'order']
+          const spX = moveToNoPt['attrs']?.['x']
+          const spY = moveToNoPt['attrs']?.['y']
+          const order = moveToNoPt['attrs']?.['order']
           multiSapeAry.push({
             type: 'movto',
             x: spX,
@@ -78,9 +78,9 @@ export function getCustomShapePath(custShapType: any, w: any, h: any) {
         if (lnToPtNode) {
           Object.keys(lnToPtNode).forEach(key => {
             const lnToNoPt = lnToPtNode[key]
-            const ptX = lnToNoPt['attrs', 'x']
-            const ptY = lnToNoPt['attrs', 'y']
-            const order = lnToNoPt['attrs', 'order']
+            const ptX = lnToNoPt['attrs']?.['x']
+            const ptY = lnToNoPt['attrs']?.['y']
+            const order = lnToNoPt['attrs']?.['order']
             multiSapeAry.push({
               type: 'lnto',
               x: ptX,
@@ -92,15 +92,15 @@ export function getCustomShapePath(custShapType: any, w: any, h: any) {
       })
     }
     if (cubicBezToNodes) {
-      const cubicBezToPtNodesAry = []
+      const cubicBezToPtNodesAry: any[] = []
       if (!Array.isArray(cubicBezToNodes)) cubicBezToNodes = [cubicBezToNodes]
       Object.keys(cubicBezToNodes).forEach(key => {
         cubicBezToPtNodesAry.push(cubicBezToNodes[key]['a:pt'])
       })
 
       cubicBezToPtNodesAry.forEach(key => {
-        const pts_ary = []
-        key.forEach(pt => {
+        const pts_ary: any[] = []
+        key.forEach((pt: any) => {
           const pt_obj = {
             x: pt['attrs']['x'],
             y: pt['attrs']['y'],
@@ -116,15 +116,15 @@ export function getCustomShapePath(custShapType: any, w: any, h: any) {
       })
     }
     if (quadBezToNodes) {
-      const quadBezToPtNodesAry = []
+      const quadBezToPtNodesAry: any[] = []
       if (!Array.isArray(quadBezToNodes)) quadBezToNodes = [quadBezToNodes]
       Object.keys(quadBezToNodes).forEach(key => {
         quadBezToPtNodesAry.push(quadBezToNodes[key]['a:pt'])
       })
 
       quadBezToPtNodesAry.forEach(key => {
-        const pts_ary = []
-        key.forEach(pt => {
+        const pts_ary: any[] = []
+        key.forEach((pt: any) => {
           const pt_obj = {
             x: pt['attrs']['x'],
             y: pt['attrs']['y'],
@@ -238,7 +238,7 @@ export function identifyShape(shapeData: any) {
 }
 
 function extractPathCommands(path: any) {
-  const commands = []
+  const commands: any[] = []
   
   if (path['a:moveTo']) {
     const moveTo = path['a:moveTo']
@@ -313,7 +313,7 @@ function analyzePathCommands(commands: any, pathWidth: any, pathHeight: any) {
     curveCount: 0,
     arcCount: 0,
     isClosed: false,
-    vertices: [],
+    vertices: [] as any[],
     aspectRatio: pathHeight !== 0 ? pathWidth / pathHeight : 1,
     pathWidth,
     pathHeight,
@@ -322,7 +322,7 @@ function analyzePathCommands(commands: any, pathWidth: any, pathHeight: any) {
     commands
   }
 
-  commands.forEach(cmd => {
+  commands.forEach((cmd: any) => {
     switch (cmd.type) {
       case 'moveTo':
         analysis.vertices.push(cmd.points[0])
@@ -365,15 +365,15 @@ function analyzePathCommands(commands: any, pathWidth: any, pathHeight: any) {
 }
 
 function checkIfCircular(commands: any, width: any, height: any) {
-  const bezierCommands = commands.filter(c => c.type === 'cubicBezTo')
+  const bezierCommands = commands.filter((c: any) => c.type === 'cubicBezTo')
   if (bezierCommands.length !== 4) return false
 
-  const endpoints = bezierCommands.map(cmd => cmd.points[2])
+  const endpoints = bezierCommands.map((cmd: any) => cmd.points[2])
   
-  const hasTop = endpoints.some(p => Math.abs(p.y) < height * 0.1)
-  const hasBottom = endpoints.some(p => Math.abs(p.y - height) < height * 0.1)
-  const hasLeft = endpoints.some(p => Math.abs(p.x) < width * 0.1)
-  const hasRight = endpoints.some(p => Math.abs(p.x - width) < width * 0.1)
+  const hasTop = endpoints.some((p: any) => Math.abs(p.y) < height * 0.1)
+  const hasBottom = endpoints.some((p: any) => Math.abs(p.y - height) < height * 0.1)
+  const hasLeft = endpoints.some((p: any) => Math.abs(p.x) < width * 0.1)
+  const hasRight = endpoints.some((p: any) => Math.abs(p.x - width) < width * 0.1)
 
   return (hasTop || hasBottom) && (hasLeft || hasRight)
 }
@@ -432,10 +432,10 @@ function matchPolygon(vertices: any, width: any, height: any) {
 
 function removeDuplicateVertices(vertices: any) {
   const threshold = 100
-  const unique = []
+  const unique: any[] = []
   
-  vertices.forEach(v => {
-    const isDuplicate = unique.some(u => 
+  vertices.forEach((v: any) => {
+    const isDuplicate = unique.some((u: any) => 
       Math.abs(u.x - v.x) < threshold && Math.abs(u.y - v.y) < threshold
     )
     if (!isDuplicate) unique.push(v)
@@ -444,10 +444,10 @@ function removeDuplicateVertices(vertices: any) {
   return unique
 }
 
-function matchQuadrilateral(vertices: any) {
+function matchQuadrilateral(vertices: any, _width?: any, _height?: any) {
   if (vertices.length !== 4) return 'custom'
 
-  const edges = []
+  const edges: any[] = []
   for (let i = 0; i < 4; i++) {
     const p1 = vertices[i]
     const p2 = vertices[(i + 1) % 4]
@@ -486,9 +486,9 @@ function isRectangle(edges: any) {
 
 function isRhombus(edges: any) {
   const tolerance = 0.1
-  const avgLength = edges.reduce((sum, e) => sum + e.length, 0) / 4
+  const avgLength = edges.reduce((sum: number, e: any) => sum + e.length, 0) / 4
   
-  return edges.every(e => Math.abs(e.length - avgLength) / avgLength < tolerance)
+  return edges.every((e: any) => Math.abs(e.length - avgLength) / avgLength < tolerance)
 }
 
 function isParallelogram(edges: any) {

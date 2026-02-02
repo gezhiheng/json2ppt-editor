@@ -29,8 +29,9 @@ export function getHorizontalAlign(node: XmlNode, pNode: XmlNode, type: string, 
   }
 
   let align = 'left'
-  if (algn) {
-    switch (algn) {
+  const algnValue = (typeof algn === 'string') ? algn : undefined
+  if (algnValue) {
+    switch (algnValue) {
       case 'l':
         align = 'left'
         break
@@ -62,7 +63,8 @@ export function getVerticalAlign(node: XmlNode, slideLayoutSpNode: XmlNode, slid
       if (!anchor) anchor = 't'
     }
   }
-  return (anchor === 'ctr') ? 'mid' : ((anchor === 'b') ? 'down' : 'up')
+  const anchorValue = (typeof anchor === 'string') ? anchor : 't'
+  return (anchorValue === 'ctr') ? 'mid' : ((anchorValue === 'b') ? 'down' : 'up')
 }
 
 type AutoFitResult =
@@ -132,10 +134,10 @@ export function getParagraphSpacing(pNode: XmlNode): AnyRecord | null {
     const spcPts = getTextByPathList(spcBefNode, ['a:spcPts', 'attrs', 'val'])
 
     if (spcPct) {
-      spacing.spaceBefore = parseInt(spcPct) / 1000 + 'em'
+      spacing.spaceBefore = parseInt(String(spcPct)) / 1000 + 'em'
     } 
     else if (spcPts) {
-      spacing.spaceBefore = parseInt(spcPts) / 100 + 'pt'
+      spacing.spaceBefore = parseInt(String(spcPts)) / 100 + 'pt'
     }
   }
 
@@ -145,10 +147,10 @@ export function getParagraphSpacing(pNode: XmlNode): AnyRecord | null {
     const spcPts = getTextByPathList(spcAftNode, ['a:spcPts', 'attrs', 'val'])
 
     if (spcPct) {
-      spacing.spaceAfter = parseInt(spcPct) / 1000 + 'em'
+      spacing.spaceAfter = parseInt(String(spcPct)) / 1000 + 'em'
     } 
     else if (spcPts) {
-      spacing.spaceAfter = parseInt(spcPts) / 100 + 'pt'
+      spacing.spaceAfter = parseInt(String(spcPts)) / 100 + 'pt'
     }
   }
 

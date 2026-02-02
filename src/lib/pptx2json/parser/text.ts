@@ -24,7 +24,7 @@ export function genTextBody(textBodyNode: any, spNode: any, slideLayoutSpNode: a
   const pNode = textBodyNode['a:p']
   const pNodes = pNode.constructor === Array ? pNode : [pNode]
 
-  const listTypes = []
+  const listTypes: string[] = []
 
   for (const pNode of pNodes) {
     let rNode = pNode['a:r']
@@ -39,11 +39,11 @@ export function genTextBody(textBodyNode: any, spNode: any, slideLayoutSpNode: a
       }
       if (brNode) {
         brNode = (brNode.constructor === Array) ? brNode : [brNode]
-        brNode.forEach(item => item.type = 'br')
+        brNode.forEach((item: any) => item.type = 'br')
   
         if (brNode.length > 1) brNode.shift()
         rNode = rNode.concat(brNode)
-        rNode.sort((a, b) => {
+        rNode.sort((a: any, b: any) => {
           if (!a.attrs || !b.attrs) return true
           return a.attrs.order - b.attrs.order
         })
@@ -92,7 +92,7 @@ export function genTextBody(textBodyNode: any, spNode: any, slideLayoutSpNode: a
       text += genSpanElement(pNode, spNode, textBodyNode, pFontStyle, slideLayoutSpNode, slideMasterSpNode, type, warpObj)
     } 
     else {
-      let prevStyleInfo = null
+      let prevStyleInfo: any = null
       let accumulatedText = ''
 
       for (const rNodeItem of rNode) {
@@ -148,7 +148,7 @@ export function getListLevel(node: any) {
   if (!pPrNode) return -1
 
   const lvlNode = getTextByPathList(pPrNode, ['attrs', 'lvl'])
-  if (lvlNode !== undefined) return parseInt(lvlNode)
+  if (lvlNode !== undefined) return parseInt(String(lvlNode))
 
   return 0
 }
@@ -170,7 +170,7 @@ export function getSpanStyleInfo(node: any, pNode: any, textBodyNode: any, pFont
   let lvl = 1
   const pPrNode = pNode['a:pPr']
   const lvlNode = getTextByPathList(pPrNode, ['attrs', 'lvl'])
-  if (lvlNode !== undefined) lvl = parseInt(lvlNode) + 1
+  if (lvlNode !== undefined) lvl = parseInt(String(lvlNode)) + 1
 
   let text = node['a:t']
   if (typeof text !== 'string') text = getTextByPathList(node, ['a:fld', 'a:t'])
@@ -192,7 +192,7 @@ export function getSpanStyleInfo(node: any, pNode: any, textBodyNode: any, pFont
     if (typeof fontColor === 'string') styleText += `color: ${fontColor};`
     else if (fontColor.colors) {
       const { colors, rot } = fontColor
-      const stops = colors.map(item => `${item.color} ${item.pos}`).join(', ')
+      const stops = colors.map((item: any) => `${item.color} ${item.pos}`).join(', ')
       const gradientStyle = `linear-gradient(${rot + 90}deg, ${stops})`
       styleText += `background: ${gradientStyle}; background-clip: text; color: transparent;`
     }

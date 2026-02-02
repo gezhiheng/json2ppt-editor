@@ -18,14 +18,14 @@ export const toPoints = (d: string) => {
   if (!d) return []
   if (d.includes('NaN') || d.includes('undefined') || d.includes('null')) return []
 
-  let pathData: SVGPathData
+  let pathData: any
   try {
     pathData = new SVGPathData(d)
   } catch {
     return []
   }
 
-  const points = []
+  const points: any[] = []
   for (const item of pathData.commands) {
     const type = typeMap[item.type]
 
@@ -64,7 +64,7 @@ export const toPoints = (d: string) => {
         type
       })
     } else if (item.type === 512) {
-      const lastPoint = points[points.length - 1]
+      const lastPoint = points[points.length - 1] as any
       if (!lastPoint || !['M', 'L', 'Q', 'C'].includes(lastPoint.type)) continue
 
       const cubicBezierPoints = arcToBezier({
@@ -77,7 +77,7 @@ export const toPoints = (d: string) => {
         xAxisRotation: item.xRot,
         largeArcFlag: item.lArcFlag,
         sweepFlag: item.sweepFlag
-      })
+      }) as Array<{ x: number; y: number; x1: number; y1: number; x2: number; y2: number }>
       for (const cbPoint of cubicBezierPoints) {
         points.push({
           x: cbPoint.x,

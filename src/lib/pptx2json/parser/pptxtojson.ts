@@ -17,7 +17,7 @@ import { parseTransition, findTransitionNode } from './animation'
 import { getSmartArtTextData } from './diagram'
 
 export async function parse(file: any) {
-  const slides = []
+  const slides: any[] = []
   
   const zip = await JSZip.loadAsync(file)
 
@@ -43,8 +43,8 @@ export async function parse(file: any) {
 async function getContentTypes(zip: any) {
   const ContentTypesJson = await readXmlFile(zip, '[Content_Types].xml')
   const subObj = ContentTypesJson['Types']['Override']
-  let slidesLocArray = []
-  let slideLayoutsLocArray = []
+  let slidesLocArray: string[] = []
+  let slideLayoutsLocArray: string[] = []
 
   for (const item of subObj) {
     switch (item['attrs']['ContentType']) {
@@ -59,8 +59,10 @@ async function getContentTypes(zip: any) {
   }
   
   const sortSlideXml = (p1: any, p2: any) => {
-    const n1 = +/(\d+)\.xml/.exec(p1)[1]
-    const n2 = +/(\d+)\.xml/.exec(p2)[1]
+    const match1 = /(\d+)\.xml/.exec(p1)
+    const match2 = /(\d+)\.xml/.exec(p2)
+    const n1 = match1 ? +match1[1] : 0
+    const n2 = match2 ? +match2[1] : 0
     return n1 - n2
   }
   slidesLocArray = slidesLocArray.sort(sortSlideXml)
@@ -126,12 +128,12 @@ async function processSingleSlide(zip: any, sldFileName: any, themeContent: any,
   let masterFilename = ''
   let themeFilename = ''
   let diagramFilename = ''
-  const diagramFiles = {}
-  const slideResObj = {}
-  const layoutResObj = {}
-  const masterResObj = {}
-  const themeResObj = {}
-  const diagramResObj = {}
+  const diagramFiles: Record<string, string> = {}
+  const slideResObj: Record<string, any> = {}
+  const layoutResObj: Record<string, any> = {}
+  const masterResObj: Record<string, any> = {}
+  const themeResObj: Record<string, any> = {}
+  const diagramResObj: Record<string, any> = {}
 
   for (const relationshipArrayItem of relationshipArray) {
     const relType = relationshipArrayItem['attrs']['Type'].replace('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', '')
@@ -237,7 +239,7 @@ async function processSingleSlide(zip: any, sldFileName: any, themeContent: any,
   }
 
   if (themeFilename) {
-    const themeName = themeFilename.split('/').pop()
+    const themeName = themeFilename.split('/').pop() || ''
     const themeResFileName = themeFilename.replace(themeName, '_rels/' + themeName) + '.rels'
     const themeResContent = await readXmlFile(zip, themeResFileName)
     if (themeResContent) {
@@ -261,9 +263,9 @@ async function processSingleSlide(zip: any, sldFileName: any, themeContent: any,
     colors: null,
     drawing: null
   }
-  let digramFileContent = {}
+  let digramFileContent: any = {}
   if (diagramFilename) {
-    const diagName = diagramFilename.split('/').pop()
+    const diagName = diagramFilename.split('/').pop() || ''
     const diagramResFileName = diagramFilename.replace(diagName, '_rels/' + diagName) + '.rels'
     digramFileContent = await readXmlFile(zip, diagramFilename)
     if (digramFileContent) {
@@ -284,7 +286,7 @@ async function processSingleSlide(zip: any, sldFileName: any, themeContent: any,
   }
 
   if (Object.values(diagramFiles).length > 0) {
-    for (const filePath of Object.values(diagramFiles)) {
+    for (const filePath of Object.values(diagramFiles) as string[]) {
       const content = await readXmlFile(zip, filePath)
       if (filePath.includes('/data')) diagramContent.data = content
       else if (filePath.includes('/layout')) diagramContent.layout = content
@@ -319,7 +321,7 @@ async function processSingleSlide(zip: any, sldFileName: any, themeContent: any,
   const layoutElements = await getLayoutElements(warpObj)
   const fill = await getSlideBackgroundFill(warpObj)
 
-  const elements = []
+  const elements: any[] = []
   for (const nodeKey in nodes) {
     if (nodes[nodeKey].constructor !== Array) nodes[nodeKey] = [nodes[nodeKey]]
     for (const node of nodes[nodeKey]) {
@@ -416,9 +418,9 @@ async function getLayoutElements(warpObj: any) {
 function indexNodes(content: any) {
   const keys = Object.keys(content)
   const spTreeNode = content[keys[0]]['p:cSld']['p:spTree']
-  const idTable = {}
-  const idxTable = {}
-  const typeTable = {}
+  const idTable: Record<string, any> = {}
+  const idxTable: Record<string, any> = {}
+  const typeTable: Record<string, any> = {}
 
   for (const key in spTreeNode) {
     if (key === 'p:nvGrpSpPr' || key === 'p:grpSpPr') continue
@@ -550,17 +552,17 @@ async function processGroupSpNode(node: any, warpObj: any, source: any, parentGr
   for (const nodeKey in node) {
     if (node[nodeKey].constructor === Array) {
       for (const item of node[nodeKey]) {
-        const ret = await processNodesInSlide(nodeKey, item, node, warpObj, source, currentGroupHierarchy)
+        const ret: any = await processNodesInSlide(nodeKey, item, node, warpObj, source, currentGroupHierarchy)
         if (ret) elements.push(ret)
       }
     }
     else {
-      const ret = await processNodesInSlide(nodeKey, node[nodeKey], node, warpObj, source, currentGroupHierarchy)
+      const ret: any = await processNodesInSlide(nodeKey, node[nodeKey], node, warpObj, source, currentGroupHierarchy)
       if (ret) elements.push(ret)
     }
   }
 
-  const processedElements = elements.map(element => ({
+  const processedElements: any[] = elements.map((element: any) => ({
     ...element,
     left: numberToFixed((element.left - chx) * ws),
     top: numberToFixed((element.top - chy) * hs),
@@ -571,10 +573,10 @@ async function processGroupSpNode(node: any, warpObj: any, source: any, parentGr
     } : {})
   }))
 
-  function processNestedGroupElements(elements: any, ws: any, hs: any, depth: any = 0) {
+  function processNestedGroupElements(elements: any[], ws: any, hs: any, depth: any = 0) {
     if (depth > 10) return elements
 
-    return elements.map(element => {
+    return elements.map((element: any) => {
       const processed = {
         ...element,
         width: numberToFixed(element.width * ws),
@@ -656,7 +658,7 @@ async function genShape(node: any, pNode: any, slideLayoutSpNode: any, slideMast
   const shapType = getTextByPathList(node, ['p:spPr', 'a:prstGeom', 'attrs', 'prst'])
   const custShapType = getTextByPathList(node, ['p:spPr', 'a:custGeom'])
 
-  const keypoints = {}
+  const keypoints: any = {}
   if (shapType) {
     const shapAdjst_ary = getTextByPathList(node, ['p:spPr', 'a:prstGeom', 'a:avLst', 'a:gd'])
     if (shapAdjst_ary) {
@@ -697,11 +699,11 @@ async function genShape(node: any, pNode: any, slideLayoutSpNode: any, slideMast
   const outerShdwNode = getTextByPathList(node, ['p:spPr', 'a:effectLst', 'a:outerShdw'])
   if (outerShdwNode) shadow = getShadow(outerShdwNode, warpObj)
 
-  const vAlign = getVerticalAlign(node, slideLayoutSpNode, slideMasterSpNode, type)
+  const vAlign = getVerticalAlign(node, slideLayoutSpNode, slideMasterSpNode)
   const isVertical = getTextByPathList(node, ['p:txBody', 'a:bodyPr', 'attrs', 'vert']) === 'eaVert'
   const autoFit = getTextAutoFit(node, slideLayoutSpNode, slideMasterSpNode)
 
-  const data = {
+  const data: any = {
     left,
     top,
     width,
@@ -875,7 +877,7 @@ async function processPicNode(node: any, warpObj: any, source: any) {
     }
   }
 
-  let rect
+  let rect: any
   const srcRectAttrs = getTextByPathList(node, ['p:blipFill', 'a:srcRect', 'attrs'])
   if (srcRectAttrs && (srcRectAttrs.t || srcRectAttrs.b || srcRectAttrs.l || srcRectAttrs.r)) {
     rect = {}
@@ -900,7 +902,7 @@ async function processPicNode(node: any, warpObj: any, source: any) {
 
   const filters = getPicFilters(node['p:blipFill'])
 
-  const imageData = {
+  const imageData: any = {
     type: 'image',
     top,
     left,
@@ -924,7 +926,7 @@ async function processPicNode(node: any, warpObj: any, source: any) {
   return imageData
 }
 
-async function processGraphicFrameNode(node: any, warpObj: any, source: any) {
+async function processGraphicFrameNode(node: any, warpObj: any, source: any): Promise<any> {
   const graphicTypeUri = getTextByPathList(node, ['a:graphic', 'a:graphicData', 'attrs', 'uri'])
   
   let result
@@ -1080,7 +1082,7 @@ async function genTable(node: any, warpObj: any) {
         }
         const text = genTextBody(tcNode['a:txBody'], tcNode, undefined, undefined, undefined, warpObj)
         const cell = await getTableCellParams(tcNode, thisTblStyle, a_sorce, warpObj)
-        const td = { text }
+        const td: any = { text }
         if (cell.rowSpan) td.rowSpan = cell.rowSpan
         if (cell.colSpan) td.colSpan = cell.colSpan
         if (cell.vMerge) td.vMerge = cell.vMerge
@@ -1112,7 +1114,7 @@ async function genTable(node: any, warpObj: any) {
 
       const text = genTextBody(tcNodes['a:txBody'], tcNodes, undefined, undefined, undefined, warpObj)
       const cell = await getTableCellParams(tcNodes, thisTblStyle, a_sorce, warpObj)
-      const td = { text }
+      const td: any = { text }
       if (cell.rowSpan) td.rowSpan = cell.rowSpan
       if (cell.colSpan) td.colSpan = cell.colSpan
       if (cell.vMerge) td.vMerge = cell.vMerge
@@ -1163,7 +1165,7 @@ async function genChart(node: any, warpObj: any) {
 
   if (!chart) return {}
 
-  const data = {
+  const data: any = {
     type: 'chart',
     top,
     left,
@@ -1190,8 +1192,8 @@ async function genDiagram(node: any, warpObj: any) {
   const { width, height } = getSize(xfrmNode, undefined, undefined)
   
   const dgmDrwSpArray = getTextByPathList(warpObj['digramFileContent'], ['p:drawing', 'p:spTree', 'p:sp'])
-  const elements = []
-  let textList = []
+  const elements: any[] = []
+  let textList: any[] = []
   if (dgmDrwSpArray) {
     const spList = Array.isArray(dgmDrwSpArray) ? dgmDrwSpArray : [dgmDrwSpArray]
 
