@@ -50,6 +50,9 @@ importers:
       tailwind-merge:
         specifier: ^2.5.2
         version: 2.6.0
+      tinycolor2:
+        specifier: ^1.6.0
+        version: 1.6.0
       txml:
         specifier: ^5.1.1
         version: 5.2.1
