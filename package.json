@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "build:json2pptx": "pnpm -C src/lib/json2pptx build",
     "dev": "vite",
+    "predev": "pnpm -C src/lib/json2pptx build",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -13,17 +15,14 @@
     "@radix-ui/react-select": "^2.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "json2pptx": "^0.1.1",
     "jszip": "^3.10.1",
     "lucide-react": "^0.563.0",
     "monaco-editor": "^0.52.0",
-    "pptxgenjs": "^3.12.0",
+    "json2pptx": "workspace:*",
+    "pptxtojson": "^1.12.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "svg-arc-to-cubic-bezier": "^3.2.0",
-    "svg-pathdata": "^6.0.3",
-    "tailwind-merge": "^2.5.2",
-    "tinycolor2": "^1.6.0"
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.4",
