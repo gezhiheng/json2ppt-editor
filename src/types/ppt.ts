@@ -12,7 +12,7 @@ export type SlideElement = {
   path?: string;
   viewBox?: [number, number];
   pathFormula?: string;
-  keypoints?: string;
+  keypoints?: number[];
   opacity?: number;
   outline?: {
     width?: number;
@@ -81,9 +81,11 @@ export type SlideElement = {
 export type Slide = {
   id?: string;
   elements?: SlideElement[];
+  remark?: string;
   background?: {
     type?: string;
     color?: string;
+    src?: string;
   };
   type?: string;
 };
@@ -94,8 +96,20 @@ export type Deck = {
   height?: number;
   slides?: Slide[];
   theme?: {
+    themeColors?: string[];
     fontName?: string;
     fontColor?: string;
     backgroundColor?: string;
+    shadow?: {
+      h?: number;
+      v?: number;
+      blur?: number;
+      color?: string;
+    };
+    outline?: {
+      width?: number;
+      color?: string;
+      style?: string;
+    };
   };
 };
