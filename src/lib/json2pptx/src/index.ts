@@ -325,6 +325,25 @@ const parseDataUrlImage = (dataUrl: string) => {
 const normalizeFontName = (value?: string) =>
   value ? value.replace(/^"+|"+$/g, "") : undefined;
 
+const clampOpacity = (value?: number) => {
+  if (value === undefined) return 1;
+  if (!Number.isFinite(value)) return 1;
+  return Math.min(1, Math.max(0, value));
+};
+
+const getOpacityRatio = (value?: string) => {
+  if (!value) return undefined;
+  const normalized = value.trim();
+  if (!normalized) return undefined;
+  if (normalized.endsWith("%")) {
+    const percent = Number.parseFloat(normalized);
+    return Number.isFinite(percent) ? Math.min(1, Math.max(0, percent / 100)) : undefined;
+  }
+  const numeric = Number.parseFloat(normalized);
+  if (!Number.isFinite(numeric)) return undefined;
+  return numeric > 1 ? Math.min(1, Math.max(0, numeric / 100)) : Math.min(1, Math.max(0, numeric));
+};
+
 const parseFontSize = (value?: string) => {
   if (!value) return undefined;
   const size = Number.parseFloat(value);
@@ -364,7 +383,8 @@ const isPlaceholderCell = (cell?: {
 
 const buildTableRows = (
   element: SlideElement,
-  ratioPx2Pt: number
+  ratioPx2Pt: number,
+  ratioPx2Inch: number
 ): PptxGenJS.TableRow[] => {
   const data = (element as any).data as
     | Array<Array<{ id?: string; colspan?: number; rowspan?: number; text?: string; style?: any }>>
@@ -418,6 +438,12 @@ const buildTableRows = (
       const fontSize = parseFontSize(style.fontsize);
       const fill = parseTableColor(style.backcolor);
       const color = parseTableColor(style.color);
+      const cellMargin = [
+        6 / ratioPx2Inch,
+        8 / ratioPx2Inch,
+        6 / ratioPx2Inch,
+        8 / ratioPx2Inch
+      ] as [number, number, number, number];
 
       const options: PptxGenJS.TableCellProps = {
         colspan: colSpan > 1 ? colSpan : undefined,
@@ -428,7 +454,7 @@ const buildTableRows = (
         fontSize: fontSize ? fontSize / ratioPx2Pt : undefined,
         color: color?.color,
         fill: fill ? { color: fill.color, transparency: fill.transparency } : undefined,
-        margin: 0
+        margin: cellMargin
       };
 
       cells.push({
@@ -500,12 +526,14 @@ const getShadowOption = (
 
 const getOutlineOption = (
   outline: NonNullable<SlideElement["outline"]>,
-  ratioPx2Pt: number
+  ratioPx2Pt: number,
+  opacity = 1
 ): PptxGenJS.ShapeLineProps => {
   const c = formatColor(outline.color || "#000000");
+  const alpha = c.alpha * clampOpacity(opacity);
   return {
     color: c.color,
-    transparency: (1 - c.alpha) * 100,
+    transparency: (1 - alpha) * 100,
     width: (outline.width || 1) / ratioPx2Pt,
     dashType: outline.style ? dashTypeMap[outline.style] : "solid"
   };
@@ -514,6 +542,14 @@ const getOutlineOption = (
 const isBase64Image = (url: string) => {
   const regex = /^data:image\/[^;]+;base64,/;
   return regex.test(url);
+};
+
+const getLineArrowType = (
+  value?: unknown
+): PptxGenJS.ShapeLineProps["beginArrowType"] => {
+  if (value === "arrow") return "arrow";
+  if (value === "dot") return "oval";
+  return "none";
 };
 
 export async function buildPptxBlob(
@@ -527,6 +563,7 @@ export async function buildPptxBlob(
   const viewportRatio = height / width;
   const ratioPx2Inch = 96 * (width / 960);
   const ratioPx2Pt = (96 / 72) * (width / 960);
+  const textPadding = 10 / ratioPx2Pt;
 
   if (Math.abs(viewportRatio - 0.625) < 0.001) pptx.layout = "LAYOUT_16x10";
   else if (Math.abs(viewportRatio - 0.75) < 0.001) pptx.layout = "LAYOUT_4x3";
@@ -549,6 +586,7 @@ export async function buildPptxBlob(
     for (const [elementIndex, element] of (slideJson.elements ?? []).entries()) {
       if (element.type === "text" && element.content) {
         const textProps = formatHTML(element.content, ratioPx2Pt);
+        const opacity = clampOpacity(element.opacity);
 
         const options: PptxGenJS.TextPropsOptions = {
           x: (element.left ?? 0) / ratioPx2Inch,
@@ -559,17 +597,16 @@ export async function buildPptxBlob(
           fontFace: element.defaultFontName || template.theme?.fontName || DEFAULT_FONT_FACE,
           color: "#000000",
           valign: "top",
-          margin: 0,
-          paraSpaceBefore: 5 / ratioPx2Pt,
-          lineSpacingMultiple: 1.5 / 1.25,
-          autoFit: true
+          margin: textPadding,
+          paraSpaceBefore: 0,
+          lineSpacingMultiple: 1.5,
+          fit: "none"
         };
         if (element.rotate) options.rotate = element.rotate;
         if (element.wordSpace) options.charSpacing = element.wordSpace / ratioPx2Pt;
-        if (element.lineHeight) options.lineSpacingMultiple = element.lineHeight / 1.25;
+        if (element.lineHeight) options.lineSpacingMultiple = element.lineHeight;
         if (element.fill) {
           const c = formatColor(element.fill);
-          const opacity = element.opacity === undefined ? 1 : element.opacity;
           options.fill = {
             color: c.color,
             transparency: (1 - c.alpha * opacity) * 100
@@ -579,12 +616,16 @@ export async function buildPptxBlob(
         }
         if (element.defaultColor) options.color = formatColor(element.defaultColor).color;
         if (element.shadow) options.shadow = getShadowOption(element.shadow, ratioPx2Pt);
-        if (element.outline?.width) options.line = getOutlineOption(element.outline, ratioPx2Pt);
-        if (element.opacity !== undefined) options.transparency = (1 - element.opacity) * 100;
+        if (element.outline?.width) {
+          options.line = getOutlineOption(element.outline, ratioPx2Pt, opacity);
+        }
+        if (element.opacity !== undefined) options.transparency = (1 - opacity) * 100;
         if (element.paragraphSpace !== undefined) {
           options.paraSpaceBefore = element.paragraphSpace / ratioPx2Pt;
         }
         if (element.vertical) options.vert = "eaVert";
+        if (element.flipH) options.flipH = element.flipH;
+        if (element.flipV) options.flipV = element.flipV;
 
         slide.addText(textProps, options);
         continue;
@@ -604,8 +645,11 @@ export async function buildPptxBlob(
         if (element.flipH) options.flipH = element.flipH;
         if (element.flipV) options.flipV = element.flipV;
         if (element.rotate) options.rotate = element.rotate;
-        if (element.filters?.opacity) {
-          options.transparency = 100 - parseInt(element.filters.opacity, 10);
+        const filterOpacity = getOpacityRatio(element.filters?.opacity) ?? 1;
+        const elementOpacity = clampOpacity(element.opacity);
+        const imageOpacity = filterOpacity * elementOpacity;
+        if (imageOpacity !== 1) {
+          options.transparency = (1 - imageOpacity) * 100;
         }
         if (element.clip?.range) {
           if (element.clip.shape === "ellipse") options.rounding = true;
@@ -638,11 +682,13 @@ export async function buildPptxBlob(
           x: (element.width ?? 0) / element.viewBox[0],
           y: (element.height ?? 0) / element.viewBox[1]
         };
-        const points = formatPoints(toPoints(element.path), ratioPx2Inch, scale);
+        const rawPoints = toPoints(element.path);
+        if (!rawPoints.length) continue;
+        const points = formatPoints(rawPoints, ratioPx2Inch, scale);
         const pattern = (element as any).pattern as string | undefined;
         const hasFill =
           typeof element.fill === "string" ? element.fill.trim().length > 0 : false;
-        const opacity = element.opacity === undefined ? 1 : element.opacity;
+        const opacity = clampOpacity(element.opacity);
 
         const options: PptxGenJS.ShapeProps = {
           x: (element.left ?? 0) / ratioPx2Inch,
@@ -670,7 +716,9 @@ export async function buildPptxBlob(
         if (element.flipH) options.flipH = element.flipH;
         if (element.flipV) options.flipV = element.flipV;
         if (element.shadow) options.shadow = getShadowOption(element.shadow, ratioPx2Pt);
-        if (element.outline?.width) options.line = getOutlineOption(element.outline, ratioPx2Pt);
+        if (element.outline?.width) {
+          options.line = getOutlineOption(element.outline, ratioPx2Pt, opacity);
+        }
         if (element.rotate) options.rotate = element.rotate;
 
         slide.addShape("custGeom" as PptxGenJS.ShapeType, options);
@@ -685,15 +733,21 @@ export async function buildPptxBlob(
             fontSize: DEFAULT_FONT_SIZE / ratioPx2Pt,
             fontFace: element.text.defaultFontName || DEFAULT_FONT_FACE,
             color: "#000000",
-            paraSpaceBefore: 5 / ratioPx2Pt,
+            paraSpaceBefore: 0,
             valign: element.text.align as PptxGenJS.VAlign,
-            fill: { color: "FFFFFF", transparency: 100 }
+            fill: { color: "FFFFFF", transparency: 100 },
+            fit: "none"
           };
           textOptions.margin = 0;
           if (element.rotate) textOptions.rotate = element.rotate;
           if (element.text.defaultColor) {
             textOptions.color = formatColor(element.text.defaultColor).color;
           }
+          if (element.opacity !== undefined) {
+            textOptions.transparency = (1 - opacity) * 100;
+          }
+          if (element.flipH) textOptions.flipH = element.flipH;
+          if (element.flipV) textOptions.flipV = element.flipV;
 
           slide.addText(textProps, textOptions);
         }
@@ -702,9 +756,13 @@ export async function buildPptxBlob(
 
       if (element.type === "line" && element.start && element.end) {
         const path = getLineElementPath(element);
-        const points = formatPoints(toPoints(path), ratioPx2Inch);
+        const rawPoints = toPoints(path);
+        if (!rawPoints.length) continue;
+        const points = formatPoints(rawPoints, ratioPx2Inch);
         const { minX, maxX, minY, maxY } = getElementRange(element);
         const c = formatColor(element.color || "#000000");
+        const opacity = clampOpacity(element.opacity);
+        const pointsMeta = element.points ?? [];
 
         const options: PptxGenJS.ShapeProps = {
           x: (element.left ?? 0) / ratioPx2Inch,
@@ -713,21 +771,23 @@ export async function buildPptxBlob(
           h: (maxY - minY) / ratioPx2Inch,
           line: {
             color: c.color,
-            transparency: (1 - c.alpha) * 100,
+            transparency: (1 - c.alpha * opacity) * 100,
             width: (element.width ?? 1) / ratioPx2Pt,
             dashType: element.style ? dashTypeMap[element.style] : "solid",
-            beginArrowType: element.points?.[0] ? "arrow" : "none",
-            endArrowType: element.points?.[1] ? "arrow" : "none"
+            beginArrowType: getLineArrowType(pointsMeta[0]),
+            endArrowType: getLineArrowType(pointsMeta[1])
           },
           points
         };
+        if (element.flipH) options.flipH = element.flipH;
+        if (element.flipV) options.flipV = element.flipV;
         if (element.shadow) options.shadow = getShadowOption(element.shadow, ratioPx2Pt);
 
         slide.addShape("custGeom" as PptxGenJS.ShapeType, options);
       }
 
       if (element.type === "table") {
-        const rows = buildTableRows(element, ratioPx2Pt);
+        const rows = buildTableRows(element, ratioPx2Pt, ratioPx2Inch);
         if (!rows.length) continue;
 
         const colWidths = (element as any).colWidths as number[] | undefined;
@@ -751,7 +811,10 @@ export async function buildPptxBlob(
                 pt: (outline.width ?? 1) / ratioPx2Pt,
                 color: formatColor(outline.color || "#000000").color.replace("#", "")
               }
-            : undefined;
+            : {
+                pt: 1 / ratioPx2Pt,
+                color: "DDDDDD"
+              };
 
         slide.addTable(rows, {
           x: (element.left ?? 0) / ratioPx2Inch,

@@ -15,7 +15,15 @@ const typeMap: Record<number, string> = {
 }
 
 export const toPoints = (d: string) => {
-  const pathData = new SVGPathData(d)
+  if (!d) return []
+  if (d.includes('NaN') || d.includes('undefined') || d.includes('null')) return []
+
+  let pathData: SVGPathData
+  try {
+    pathData = new SVGPathData(d)
+  } catch {
+    return []
+  }
 
   const points = []
   for (const item of pathData.commands) {
