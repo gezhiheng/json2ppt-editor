@@ -20,6 +20,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      json2pptx:
+        specifier: ^0.1.1
+        version: 0.1.1
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
@@ -987,6 +990,9 @@ packages:
     resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
     engines: {node: '>=6'}
     hasBin: true
+
+  json2pptx@0.1.1:
+    resolution: {integrity: sha512-mN1DxviBn3m3i5cgf2xAnp+lMpDn0sADa86Q5m9wUOBznp4aYFz5CFLUT+tPqTgRAR+3pMhZTAyEA+ogfTmXbA==}
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -2126,6 +2132,14 @@ snapshots:
   js-tokens@4.0.0: {}
 
   jsesc@3.1.0: {}
+
+  json2pptx@0.1.1:
+    dependencies:
+      jszip: 3.10.1
+      pptxgenjs: 3.12.0
+      svg-arc-to-cubic-bezier: 3.2.0
+      svg-pathdata: 6.0.3
+      tinycolor2: 1.6.0
 
   json5@2.2.3: {}
 

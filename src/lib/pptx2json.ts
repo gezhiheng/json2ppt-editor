@@ -5,7 +5,7 @@ import {
   ENABLE_DECK_JSON,
   PPTX_JSON_PAYLOAD_PATH,
   PPTX_JSON_PAYLOAD_VERSION
-} from "./json2pptx";
+} from "json2pptx";
 
 const EMU_PER_INCH = 914400;
 const PX_PER_INCH = 96;

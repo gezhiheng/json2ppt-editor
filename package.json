@@ -13,6 +13,7 @@
     "@radix-ui/react-select": "^2.1.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "json2pptx": "^0.1.1",
     "jszip": "^3.10.1",
     "lucide-react": "^0.563.0",
     "monaco-editor": "^0.52.0",
@@ -21,8 +22,8 @@
     "react-dom": "^18.3.1",
     "svg-arc-to-cubic-bezier": "^3.2.0",
     "svg-pathdata": "^6.0.3",
-    "tinycolor2": "^1.6.0",
-    "tailwind-merge": "^2.5.2"
+    "tailwind-merge": "^2.5.2",
+    "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.4",
