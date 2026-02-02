@@ -9,4 +9,4 @@ export interface PptxParseResult {
   size: PptxSize;
 }
 
-export function parse(file: ArrayBuffer, options?: Record<string, unknown>): Promise<PptxParseResult>;
+export function parse(file: ArrayBuffer, options?: Record<string, unknown>: any): Promise<PptxParseResult>;
