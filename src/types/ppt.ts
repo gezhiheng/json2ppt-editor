@@ -8,6 +8,7 @@ export type SlideElement = {
   height?: number;
   rotate?: number;
   fill?: string;
+  pattern?: string;
   path?: string;
   viewBox?: [number, number];
   pathFormula?: string;
@@ -52,6 +53,23 @@ export type SlideElement = {
     grayscale?: string;
     opacity?: string;
   };
+  colWidths?: number[];
+  data?: Array<
+    Array<{
+      id?: string;
+      colspan?: number;
+      rowspan?: number;
+      text?: string;
+      style?: {
+        fontname?: string;
+        color?: string;
+        align?: string;
+        fontsize?: string;
+        backcolor?: string;
+      };
+    }>
+  >;
+  cellMinHeight?: number;
   text?: {
     content: string;
     defaultColor?: string;

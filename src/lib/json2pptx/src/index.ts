@@ -242,6 +242,209 @@ const dashTypeMap: Record<string, "solid" | "dash" | "sysDot"> = {
   dotted: "sysDot"
 };
 
+type PatternShape = {
+  slideIndex: number;
+  objectName: string;
+  dataUrl: string;
+};
+
+const stripFillTags = (value: string) =>
+  value
+    .replace(/<a:solidFill>[\s\S]*?<\/a:solidFill>/g, "")
+    .replace(/<a:gradFill>[\s\S]*?<\/a:gradFill>/g, "")
+    .replace(/<a:blipFill>[\s\S]*?<\/a:blipFill>/g, "")
+    .replace(/<a:noFill\s*\/>/g, "")
+    .replace(/<a:noFill><\/a:noFill>/g, "");
+
+const applyPatternFill = (slideXml: string, objectName: string, relId: string) => {
+  const nameToken = `name="${objectName}"`;
+  let cursor = 0;
+  let result = slideXml;
+
+  while (true) {
+    const nameIndex = result.indexOf(nameToken, cursor);
+    if (nameIndex === -1) break;
+
+    const spStart = result.lastIndexOf("<p:sp", nameIndex);
+    const spEnd = result.indexOf("</p:sp>", nameIndex);
+    if (spStart === -1 || spEnd === -1) break;
+
+    const spXml = result.slice(spStart, spEnd + "</p:sp>".length);
+    const spPrStart = spXml.indexOf("<p:spPr>");
+    const spPrEnd = spXml.indexOf("</p:spPr>");
+    if (spPrStart === -1 || spPrEnd === -1) {
+      cursor = spEnd + 1;
+      continue;
+    }
+
+    const spPrOpenEnd = spXml.indexOf(">", spPrStart);
+    const spPrInner = spXml.slice(spPrOpenEnd + 1, spPrEnd);
+    const cleanedInner = stripFillTags(spPrInner);
+    const blipFill = `<a:blipFill><a:blip r:embed="${relId}"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></a:blipFill>`;
+    let nextInner = cleanedInner;
+
+    if (cleanedInner.includes("</a:custGeom>")) {
+      nextInner = cleanedInner.replace("</a:custGeom>", `</a:custGeom>${blipFill}`);
+    } else {
+      const lnIndex = cleanedInner.indexOf("<a:ln");
+      nextInner =
+        lnIndex === -1
+          ? `${cleanedInner}${blipFill}`
+          : `${cleanedInner.slice(0, lnIndex)}${blipFill}${cleanedInner.slice(lnIndex)}`;
+    }
+
+    const updatedSpXml =
+      spXml.slice(0, spPrOpenEnd + 1) +
+      nextInner +
+      spXml.slice(spPrEnd);
+
+    result = result.slice(0, spStart) + updatedSpXml + result.slice(spEnd + "</p:sp>".length);
+    cursor = spStart + updatedSpXml.length;
+  }
+
+  return result;
+};
+
+const parseDataUrlImage = (dataUrl: string) => {
+  const match = dataUrl.match(/^data:(image\/[^;]+);base64,(.+)$/);
+  if (!match) return null;
+  const mime = match[1];
+  const data = match[2];
+  const extMap: Record<string, string> = {
+    "image/jpeg": "jpeg",
+    "image/jpg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/svg+xml": "svg",
+    "image/webp": "webp",
+    "image/bmp": "bmp"
+  };
+  return { mime, data, ext: extMap[mime] ?? "png" };
+};
+
+const normalizeFontName = (value?: string) =>
+  value ? value.replace(/^"+|"+$/g, "") : undefined;
+
+const parseFontSize = (value?: string) => {
+  if (!value) return undefined;
+  const size = Number.parseFloat(value);
+  return Number.isFinite(size) ? size : undefined;
+};
+
+const parseTableColor = (value?: string) => {
+  if (!value) return undefined;
+  const normalized = value.trim();
+  if (!normalized) return undefined;
+  const c = formatColor(normalized);
+  return {
+    color: c.color.replace("#", ""),
+    transparency: (1 - c.alpha) * 100
+  };
+};
+
+const isPlaceholderCell = (cell?: {
+  colspan?: number;
+  rowspan?: number;
+  text?: string;
+  style?: Record<string, string | undefined>;
+}) => {
+  if (!cell) return false;
+  const colspan = cell.colspan ?? 1;
+  const rowspan = cell.rowspan ?? 1;
+  if (colspan !== 1 || rowspan !== 1) return false;
+  const text = cell.text ?? "";
+  const style = cell.style;
+  const hasStyle =
+    Boolean(style?.fontname) ||
+    Boolean(style?.fontsize) ||
+    Boolean(style?.color) ||
+    Boolean(style?.backcolor);
+  return text.trim() === "" && !hasStyle;
+};
+
+const buildTableRows = (
+  element: SlideElement,
+  ratioPx2Pt: number
+): PptxGenJS.TableRow[] => {
+  const data = (element as any).data as
+    | Array<Array<{ id?: string; colspan?: number; rowspan?: number; text?: string; style?: any }>>
+    | undefined;
+  if (!data || !data.length) return [];
+
+  const colCount =
+    ((element as any).colWidths as number[] | undefined)?.length ??
+    Math.max(...data.map((row) => row.length));
+
+  const rows: PptxGenJS.TableRow[] = [];
+  const skip = new Array(colCount).fill(0);
+
+  data.forEach((row, rowIndex) => {
+    const cells: PptxGenJS.TableCell[] = [];
+    let colIndex = 0;
+    let cellIndex = 0;
+
+    while (colIndex < colCount) {
+      if (skip[colIndex] > 0) {
+        skip[colIndex] -= 1;
+        if (isPlaceholderCell(row[cellIndex])) {
+          cellIndex += 1;
+        }
+        colIndex += 1;
+        continue;
+      }
+
+      const cell = row[cellIndex];
+      if (!cell) break;
+      cellIndex += 1;
+
+      const colSpan = cell.colspan ?? 1;
+      const rowSpan = cell.rowspan ?? 1;
+
+      if (rowSpan > 1) {
+        for (let i = 0; i < colSpan; i += 1) {
+          skip[colIndex + i] = rowSpan - 1;
+        }
+      }
+
+      if (colSpan > 1) {
+        for (let i = 0; i < colSpan - 1; i += 1) {
+          if (isPlaceholderCell(row[cellIndex])) {
+            cellIndex += 1;
+          }
+        }
+      }
+
+      const style = cell.style ?? {};
+      const fontSize = parseFontSize(style.fontsize);
+      const fill = parseTableColor(style.backcolor);
+      const color = parseTableColor(style.color);
+
+      const options: PptxGenJS.TableCellProps = {
+        colspan: colSpan > 1 ? colSpan : undefined,
+        rowspan: rowSpan > 1 ? rowSpan : undefined,
+        align: style.align as PptxGenJS.HAlign,
+        valign: "middle",
+        fontFace: normalizeFontName(style.fontname),
+        fontSize: fontSize ? fontSize / ratioPx2Pt : undefined,
+        color: color?.color,
+        fill: fill ? { color: fill.color, transparency: fill.transparency } : undefined,
+        margin: 0
+      };
+
+      cells.push({
+        text: cell.text ?? "",
+        options
+      });
+
+      colIndex += colSpan;
+    }
+
+    rows.push(cells);
+  });
+
+  return rows;
+};
+
 const getShadowOption = (
   shadow: NonNullable<SlideElement["shadow"]>,
   ratioPx2Pt: number
@@ -317,6 +520,7 @@ export async function buildPptxBlob(
   template: Deck
 ): Promise<{ blob: Blob; fileName: string }> {
   const pptx = new PptxGenJS();
+  const patternShapes: PatternShape[] = [];
 
   const width = template.width ?? DEFAULT_WIDTH;
   const height = template.height ?? DEFAULT_HEIGHT;
@@ -334,7 +538,7 @@ export async function buildPptxBlob(
     pptx.layout = "A3_V";
   } else pptx.layout = "LAYOUT_16x9";
 
-  for (const slideJson of template.slides ?? []) {
+  for (const [slideIndex, slideJson] of (template.slides ?? []).entries()) {
     const slide = pptx.addSlide();
     const backgroundColor = slideJson.background?.color;
     if (backgroundColor) {
@@ -342,7 +546,7 @@ export async function buildPptxBlob(
       slide.background = { color: c.color, transparency: (1 - c.alpha) * 100 };
     }
 
-    for (const element of slideJson.elements ?? []) {
+    for (const [elementIndex, element] of (slideJson.elements ?? []).entries()) {
       if (element.type === "text" && element.content) {
         const textProps = formatHTML(element.content, ratioPx2Pt);
 
@@ -355,7 +559,7 @@ export async function buildPptxBlob(
           fontFace: element.defaultFontName || template.theme?.fontName || DEFAULT_FONT_FACE,
           color: "#000000",
           valign: "top",
-          margin: 10 / ratioPx2Pt,
+          margin: 0,
           paraSpaceBefore: 5 / ratioPx2Pt,
           lineSpacingMultiple: 1.5 / 1.25,
           autoFit: true
@@ -370,6 +574,8 @@ export async function buildPptxBlob(
             color: c.color,
             transparency: (1 - c.alpha * opacity) * 100
           };
+        } else {
+          options.fill = { color: "FFFFFF", transparency: 100 };
         }
         if (element.defaultColor) options.color = formatColor(element.defaultColor).color;
         if (element.shadow) options.shadow = getShadowOption(element.shadow, ratioPx2Pt);
@@ -433,8 +639,9 @@ export async function buildPptxBlob(
           y: (element.height ?? 0) / element.viewBox[1]
         };
         const points = formatPoints(toPoints(element.path), ratioPx2Inch, scale);
-
-        let fillColor = formatColor(element.fill || "#000000");
+        const pattern = (element as any).pattern as string | undefined;
+        const hasFill =
+          typeof element.fill === "string" ? element.fill.trim().length > 0 : false;
         const opacity = element.opacity === undefined ? 1 : element.opacity;
 
         const options: PptxGenJS.ShapeProps = {
@@ -442,12 +649,23 @@ export async function buildPptxBlob(
           y: (element.top ?? 0) / ratioPx2Inch,
           w: (element.width ?? 0) / ratioPx2Inch,
           h: (element.height ?? 0) / ratioPx2Inch,
-          fill: {
-            color: fillColor.color,
-            transparency: (1 - fillColor.alpha * opacity) * 100
-          },
           points
         };
+
+        if (pattern) {
+          const objectName = `pattern-${slideIndex}-${element.id ?? elementIndex}`;
+          options.objectName = objectName;
+          options.fill = { color: "FFFFFF", transparency: 100 };
+          patternShapes.push({ slideIndex, objectName, dataUrl: pattern });
+        } else if (hasFill) {
+          const fillColor = formatColor(element.fill || "#000000");
+          options.fill = {
+            color: fillColor.color,
+            transparency: (1 - fillColor.alpha * opacity) * 100
+          };
+        } else {
+          options.fill = { color: "FFFFFF", transparency: 100 };
+        }
 
         if (element.flipH) options.flipH = element.flipH;
         if (element.flipV) options.flipV = element.flipV;
@@ -468,8 +686,10 @@ export async function buildPptxBlob(
             fontFace: element.text.defaultFontName || DEFAULT_FONT_FACE,
             color: "#000000",
             paraSpaceBefore: 5 / ratioPx2Pt,
-            valign: element.text.align as PptxGenJS.VAlign
+            valign: element.text.align as PptxGenJS.VAlign,
+            fill: { color: "FFFFFF", transparency: 100 }
           };
+          textOptions.margin = 0;
           if (element.rotate) textOptions.rotate = element.rotate;
           if (element.text.defaultColor) {
             textOptions.color = formatColor(element.text.defaultColor).color;
@@ -505,6 +725,45 @@ export async function buildPptxBlob(
 
         slide.addShape("custGeom" as PptxGenJS.ShapeType, options);
       }
+
+      if (element.type === "table") {
+        const rows = buildTableRows(element, ratioPx2Pt);
+        if (!rows.length) continue;
+
+        const colWidths = (element as any).colWidths as number[] | undefined;
+        const colW = colWidths
+          ? colWidths.map((ratio) => ((element.width ?? 0) * ratio) / ratioPx2Inch)
+          : undefined;
+
+        const rowCount = rows.length || 1;
+        const baseRowHeight = ((element.height ?? 0) / rowCount) / ratioPx2Inch;
+        const minRowHeight = (element as any).cellMinHeight
+          ? (element as any).cellMinHeight / ratioPx2Inch
+          : undefined;
+        const rowH = minRowHeight
+          ? new Array(rowCount).fill(Math.max(minRowHeight, baseRowHeight))
+          : undefined;
+
+        const outline = element.outline;
+        const border =
+          outline?.width || outline?.color
+            ? {
+                pt: (outline.width ?? 1) / ratioPx2Pt,
+                color: formatColor(outline.color || "#000000").color.replace("#", "")
+              }
+            : undefined;
+
+        slide.addTable(rows, {
+          x: (element.left ?? 0) / ratioPx2Inch,
+          y: (element.top ?? 0) / ratioPx2Inch,
+          w: (element.width ?? 0) / ratioPx2Inch,
+          h: (element.height ?? 0) / ratioPx2Inch,
+          colW,
+          rowH,
+          border,
+          margin: 0
+        });
+      }
     }
   }
 
@@ -514,22 +773,88 @@ export async function buildPptxBlob(
     compression: true
   })) as ArrayBuffer;
 
-  if (!ENABLE_DECK_JSON) {
+  const needsZip = ENABLE_DECK_JSON || patternShapes.length > 0;
+  if (!needsZip) {
     return { blob: new Blob([pptxBuffer]), fileName };
   }
 
   const zip = await JSZip.loadAsync(pptxBuffer);
-  zip.file(
-    PPTX_JSON_PAYLOAD_PATH,
-    JSON.stringify(
-      {
-        version: PPTX_JSON_PAYLOAD_VERSION,
-        deck: template
-      },
-      null,
-      2
-    )
-  );
+  if (patternShapes.length) {
+    const mediaFiles = Object.keys(zip.files).filter((name) => name.startsWith("ppt/media/"));
+    let maxImageIndex = 0;
+    for (const name of mediaFiles) {
+      const match = name.match(/ppt\/media\/image(\d+)/);
+      if (match) {
+        const index = Number.parseInt(match[1], 10);
+        if (Number.isFinite(index)) maxImageIndex = Math.max(maxImageIndex, index);
+      }
+    }
+
+    const slideCache = new Map<number, string>();
+    const relsCache = new Map<number, string>();
+
+    for (const pattern of patternShapes) {
+      const parsed = parseDataUrlImage(pattern.dataUrl);
+      if (!parsed) continue;
+
+      maxImageIndex += 1;
+      const imageName = `image${maxImageIndex}.${parsed.ext}`;
+      zip.file(`ppt/media/${imageName}`, parsed.data, { base64: true });
+
+      const slideNumber = pattern.slideIndex + 1;
+      const slidePath = `ppt/slides/slide${slideNumber}.xml`;
+      const relsPath = `ppt/slides/_rels/slide${slideNumber}.xml.rels`;
+
+      const relsXml =
+        relsCache.get(slideNumber) ??
+        (zip.file(relsPath)
+          ? await zip.file(relsPath)!.async("string")
+          : `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`);
+
+      let maxRelId = 0;
+      relsXml.replace(/Id="rId(\d+)"/g, (_, id) => {
+        const value = Number.parseInt(id, 10);
+        if (Number.isFinite(value)) maxRelId = Math.max(maxRelId, value);
+        return "";
+      });
+      const relId = `rId${maxRelId + 1}`;
+      const relEntry = `<Relationship Id="${relId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/${imageName}"/>`;
+      const nextRelsXml = relsXml.replace(
+        "</Relationships>",
+        `${relEntry}</Relationships>`
+      );
+      relsCache.set(slideNumber, nextRelsXml);
+
+      const slideXml =
+        slideCache.get(slideNumber) ??
+        (zip.file(slidePath) ? await zip.file(slidePath)!.async("string") : "");
+      const nextSlideXml = slideXml
+        ? applyPatternFill(slideXml, pattern.objectName, relId)
+        : slideXml;
+      slideCache.set(slideNumber, nextSlideXml);
+    }
+
+    for (const [slideNumber, xml] of slideCache.entries()) {
+      zip.file(`ppt/slides/slide${slideNumber}.xml`, xml);
+    }
+    for (const [slideNumber, xml] of relsCache.entries()) {
+      zip.file(`ppt/slides/_rels/slide${slideNumber}.xml.rels`, xml);
+    }
+  }
+
+  if (ENABLE_DECK_JSON) {
+    zip.file(
+      PPTX_JSON_PAYLOAD_PATH,
+      JSON.stringify(
+        {
+          version: PPTX_JSON_PAYLOAD_VERSION,
+          deck: template
+        },
+        null,
+        2
+      )
+    );
+  }
   const blob = await zip.generateAsync({ type: "blob" });
   return { blob, fileName };
 }

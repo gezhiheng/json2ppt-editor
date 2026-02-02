@@ -66,6 +66,7 @@ export type ShapeElement = BaseElement<'shape'> & {
   path?: string
   viewBox?: [number, number]
   fill?: string
+  pattern?: string
   text?: TextContent
 }
 
@@ -82,7 +83,35 @@ export type LineElement = BaseElement<'line'> & {
   points?: [unknown, unknown]
 }
 
-export type SlideElement = TextElement | ImageElement | ShapeElement | LineElement
+export type TableCellStyle = {
+  fontname?: string
+  color?: string
+  align?: string
+  fontsize?: string
+  backcolor?: string
+}
+
+export type TableCellData = {
+  id?: string
+  colspan?: number
+  rowspan?: number
+  text?: string
+  style?: TableCellStyle
+}
+
+export type TableElement = BaseElement<'table'> & {
+  type: 'table'
+  colWidths?: number[]
+  data?: TableCellData[][]
+  cellMinHeight?: number
+}
+
+export type SlideElement =
+  | TextElement
+  | ImageElement
+  | ShapeElement
+  | LineElement
+  | TableElement
 
 export type SlideBackground = {
   color?: string
