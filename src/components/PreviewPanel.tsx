@@ -98,15 +98,20 @@ export function PreviewPanel ({
             className='hidden'
             onChange={handleFileChange}
           />
-          <Button
-            variant='secondary'
-            size='sm'
-            className={toolButtonClass}
-            onClick={handleUploadClick}
-            disabled={isExporting || isImporting}
-          >
-            <Download className='h-4 w-4' />
-          </Button>
+          <div className='relative'>
+            <Button
+              variant='secondary'
+              size='sm'
+              className={toolButtonClass}
+              onClick={handleUploadClick}
+              disabled={isExporting || isImporting}
+            >
+              <Download className='h-4 w-4' />
+            </Button>
+            <div className='absolute -right-2 -top-2 rounded-md bg-ember-500 px-1 py-0.5 text-[8px] font-bold uppercase leading-none text-white shadow-sm ring-1 ring-white'>
+              Beta
+            </div>
+          </div>
           <Button
             variant='secondary'
             size='sm'

@@ -13,6 +13,7 @@ export type SlideElement = {
   viewBox?: [number, number];
   pathFormula?: string;
   keypoints?: number[];
+  special?: boolean;
   opacity?: number;
   outline?: {
     width?: number;
