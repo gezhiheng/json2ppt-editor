@@ -4,8 +4,12 @@
   "height": 562.5,
   "theme": {
     "themeColors": [
-      "rgba(227,199,159,1)",
-      "rgba(0,49,83,1)"
+      "rgb(227,199,159)",
+      "rgb(133,18,15)",
+      "rgb(51,51,51)",
+      "rgba(0,49,83,1)",
+      "rgb(36,36,36)",
+      "rgba(199,170,129,1)"
     ],
     "fontColor": "#333",
     "fontName": "LXGWWenKai",
