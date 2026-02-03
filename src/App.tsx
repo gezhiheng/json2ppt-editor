@@ -12,6 +12,7 @@ import {
   templateList,
   type TemplateEntry
 } from './lib/templates'
+import { applyThemeToDeck } from './lib/theme'
 import type { Deck } from './types/ppt'
 
 const MIN_PREVIEW_WIDTH = 320
@@ -238,6 +239,24 @@ export default function App (): JSX.Element {
     }
   }
 
+  function handleApplyTheme (
+    themeColors: string[],
+    fontColor: string,
+    backgroundColor: string
+  ): void {
+    const current = safeParse(jsonText)
+    if (!current.data) {
+      alert('JSON parse error. Fix the JSON before applying theme.')
+      return
+    }
+    const updated = applyThemeToDeck(current.data, {
+      themeColors,
+      fontColor,
+      backgroundColor
+    })
+    setJsonText(JSON.stringify(updated, null, 2))
+  }
+
   return (
     <div className='h-screen px-6 py-6'>
       <div className='mx-auto flex h-full flex-col gap-6'>
@@ -248,6 +267,7 @@ export default function App (): JSX.Element {
           jsonError={parsed.error}
           onTemplateChange={applyTemplate}
           onResetTemplate={() => applyTemplate(selectedTemplate?.id ?? '')}
+          onApplyTheme={handleApplyTheme}
         />
 
         <main
