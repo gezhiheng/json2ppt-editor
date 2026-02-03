@@ -34,7 +34,12 @@ export function applyThemeToDeck (deck: Deck, update: ThemeUpdate): Deck {
   const nextBackground = update.backgroundColor ?? previousTheme.backgroundColor
   const prevBackground = previousTheme.backgroundColor
   const slides = deck.slides?.map((slide) => {
-    const nextSlide = replaceSlideColors(slide, themeMappings, fontMappings)
+    const nextSlide = replaceSlideColors(
+      slide,
+      themeMappings,
+      fontMappings,
+      update.fontColor
+    )
     if (!nextBackground) return nextSlide
     const currentColor = nextSlide.background?.color
     const shouldUpdate =
@@ -67,7 +72,8 @@ export function applyThemeToDeck (deck: Deck, update: ThemeUpdate): Deck {
 function replaceSlideColors (
   slide: Slide,
   themeMappings: ColorMapping[],
-  fontMappings: ColorMapping[]
+  fontMappings: ColorMapping[],
+  fontColor: string
 ): Slide {
   const { elements, ...rest } = slide
   const nextSlide = replaceColorsDeep(rest, themeMappings) as Slide
@@ -75,7 +81,7 @@ function replaceSlideColors (
 
   const nextElements = elements.map((element) => {
     if (element && typeof element === 'object' && element.type === 'text') {
-      return replaceTextElementColors(element, fontMappings)
+      return replaceTextElementColors(element, fontMappings, fontColor)
     }
     return replaceColorsDeep(element, themeMappings)
   })
@@ -85,14 +91,22 @@ function replaceSlideColors (
 
 function replaceTextElementColors (
   element: Slide['elements'][number],
-  fontMappings: ColorMapping[]
+  fontMappings: ColorMapping[],
+  fontColor: string
 ): Slide['elements'][number] {
   if (!element || typeof element !== 'object') return element
   const next = replaceColorsDeep(element, fontMappings) as Slide['elements'][number]
-  if (!('content' in next) || typeof next.content !== 'string') return next
+  const normalizedFontColor = normalizeThemeColor(fontColor) ?? fontColor
+  const withDefault =
+    normalizedFontColor && 'defaultColor' in next
+      ? { ...next, defaultColor: normalizedFontColor }
+      : next
+  if (!('content' in withDefault) || typeof withDefault.content !== 'string') {
+    return withDefault
+  }
   return {
-    ...next,
-    content: applyFontColorToHtml(next.content, fontMappings)
+    ...withDefault,
+    content: applyFontColorToHtml(withDefault.content, normalizedFontColor)
   }
 }
 
@@ -136,29 +150,20 @@ function replaceColorsInText (value: string, mappings: ColorMapping[]): string {
   return next
 }
 
-function applyFontColorToHtml (value: string, mappings: ColorMapping[]): string {
-  if (!value || !mappings.length) return value
-  const mapped = mappings[0]
-  if (!mapped) return value
-  const mappedColor = mapped.toHex ?? rgbToString(mapped.toRgb)
+function applyFontColorToHtml (value: string, fontColor: string): string {
+  if (!value || !fontColor) return value
+  const normalized = normalizeThemeColor(fontColor) ?? fontColor
   const hasStyleColor = /\bcolor\s*:/i.test(value)
   if (hasStyleColor) {
-    return value.replace(
-      /color\s*:\s*([^;"']+)/gi,
-      (_match, colorValue: string) => {
-        const trimmed = String(colorValue).trim()
-        if (!trimmed) return _match
-        return `color: ${replaceColorValue(trimmed, [mapped])}`
-      }
-    )
+    return value.replace(/color\s*:\s*([^;"']+)/gi, () => `color: ${normalized}`)
   }
   return value.replace(
     /(<[^>]+style\s*=\s*["'])([^"']*)(["'])/gi,
     (_match, start, styles, end) => {
       if (/\bcolor\s*:/i.test(styles)) return _match
       const nextStyles = styles.trim()
-        ? `${styles.trim()}; color: ${mappedColor}`
-        : `color: ${mappedColor}`
+        ? `${styles.trim()}; color: ${normalized}`
+        : `color: ${normalized}`
       return `${start}${nextStyles}${end}`
     }
   )
@@ -240,6 +245,17 @@ function normalizeHexColor (value: string): string | null {
           .join('')
       : withHash
   return `#${expanded.toUpperCase()}`
+}
+
+function normalizeThemeColor (value: string): string | null {
+  const hex = normalizeHexColor(value)
+  if (hex) return hex
+  const parsed = parseColorToRgb(value)
+  if (!parsed) return null
+  if (parsed.alpha !== undefined) {
+    return `rgba(${parsed.r},${parsed.g},${parsed.b},${parsed.alpha})`
+  }
+  return `rgb(${parsed.r},${parsed.g},${parsed.b})`
 }
 
 function parseColorToRgb (

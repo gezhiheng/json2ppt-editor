@@ -1,0 +1,147 @@
+{
+  "id": "TJaL3WU3OI",
+  "background": {
+    "type": "solid",
+    "color": "rgb(255,255,255)"
+  },
+  "type": "cover",
+  "elements": [
+    {
+      "type": "shape",
+      "id": "BfMUge-JhW",
+      "left": 527.5,
+      "top": -63.8,
+      "width": 690,
+      "height": 690,
+      "viewBox": [
+        200,
+        200
+      ],
+      "path": "M 100 0 A 50 50 0 1 1 100 200 A 50 50 0 1 1 100 0 Z",
+      "fill": "#ffffff",
+      "fixedRatio": true,
+      "rotate": 0,
+      "outline": {
+        "width": 1,
+        "color": "rgb(155, 0, 0)",
+        "style": "solid"
+      },
+      "lock": false
+    },
+    {
+      "type": "image",
+      "id": "OoWeIcEWjW",
+      "src": "https://images.pexels.com/photos/29928161/pexels-photo-29928161.jpeg?auto=compress&cs=tinysrgb&w=600",
+      "width": 665,
+      "height": 665,
+      "left": 540,
+      "top": -51.3,
+      "fixedRatio": true,
+      "rotate": 0,
+      "clip": {
+        "shape": "ellipse",
+        "range": [
+          [
+            0,
+            0
+          ],
+          [
+            100,
+            100
+          ]
+        ]
+      },
+      "filters": {
+        "grayscale": "100%",
+        "opacity": "100%"
+      },
+      "lock": true,
+      "imageType": "pageFigure"
+    },
+    {
+      "type": "shape",
+      "id": "erml8zJNbk",
+      "left": 0,
+      "top": 0,
+      "width": 1000,
+      "height": 562.5,
+      "viewBox": [
+        200,
+        200
+      ],
+      "path": "M 0 0 L 200 0 L 200 200 L 0 200 Z",
+      "fill": "#00000000",
+      "fixedRatio": false,
+      "rotate": 0,
+      "outline": {
+        "width": 20,
+        "color": "rgb(155, 0, 0)",
+        "style": "solid"
+      },
+      "lock": true
+    },
+    {
+      "type": "text",
+      "id": "oceR4eX40A",
+      "left": 35,
+      "top": 136.5,
+      "width": 470,
+      "height": 80,
+      "content": "<p style=\"\"><strong><span style=\"font-size: 40px;\"><span style=\"color: rgb(155, 0, 0);\">模板封面标题</span></span></strong></p>",
+      "rotate": 0,
+      "defaultFontName": "",
+      "defaultColor": "#EBD5D5",
+      "vertical": false,
+      "textType": "title"
+    },
+    {
+      "type": "line",
+      "id": "GNHoTH7Jup",
+      "left": 50,
+      "top": 231.1011862396204,
+      "start": [
+        0,
+        0
+      ],
+      "end": [
+        200.93119810201662,
+        0
+      ],
+      "points": [
+        "",
+        ""
+      ],
+      "color": "rgb(155, 0, 0)",
+      "style": "solid",
+      "width": 1,
+      "lock": true
+    },
+    {
+      "type": "text",
+      "id": "NRraxaj2D1",
+      "left": 35,
+      "top": 252.5,
+      "width": 450,
+      "height": 92,
+      "content": "<p style=\"\"><em><span style=\"font-size: 16px;\"><span style=\"color: rgb(128, 128, 128);\">模板封面正文模板封面正文模板封面正文模板封面正文模板封面正文模板封面正文模板封面正文模板封面正文模板封面正文模板封面</span></span></em></p>",
+      "rotate": 0,
+      "defaultFontName": "",
+      "defaultColor": "#EBD5D5",
+      "vertical": false,
+      "textType": "content"
+    },
+    {
+      "type": "text",
+      "id": "cIC8jvn_Z4",
+      "left": 35,
+      "top": 489.3069988137604,
+      "width": 160,
+      "height": 44,
+      "content": "<p style=\"\"><em><span style=\"font-size: 16px;\"><span style=\"color: rgb(128, 128, 128);\">演讲人：XXX</span></span></em></p>",
+      "rotate": 0,
+      "defaultFontName": "",
+      "defaultColor": "#EBD5D5",
+      "vertical": false
+    }
+  ]
+}
