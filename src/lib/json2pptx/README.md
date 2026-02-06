@@ -11,7 +11,7 @@ npm i json2pptx
 ## 使用
 
 ```ts
-import { buildPptxBlob } from 'json2pptx'
+import { createPPTX } from 'json2pptx'
 
 const deck = {
   title: 'Demo',
@@ -34,7 +34,7 @@ const deck = {
   ]
 }
 
-const { blob, fileName } = await buildPptxBlob(deck)
+const { blob, fileName } = await createPPTX(deck)
 // 在浏览器中下载：
 // const url = URL.createObjectURL(blob)
 // const a = document.createElement('a')
@@ -45,7 +45,7 @@ const { blob, fileName } = await buildPptxBlob(deck)
 
 ## API
 
-### `buildPptxBlob(template: Deck): Promise<{ blob: Blob; fileName: string }>`
+### `createPPTX(template: Deck): Promise<{ blob: Blob; fileName: string }>`
 
 根据 `Deck` 数据生成 PPTX 的 `Blob` 与建议文件名。
 

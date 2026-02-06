@@ -100,7 +100,7 @@ function parseDataUrlImage(
   return { mime, data, ext: extMap[mime] ?? "png" };
 }
 
-export async function buildPptxBlob(
+export async function createPPTX(
   template: Deck
 ): Promise<{ blob: Blob; fileName: string }> {
   const pptx = new PptxGenJS();
@@ -226,6 +226,9 @@ export async function buildPptxBlob(
   const blob = await zip.generateAsync({ type: "blob" });
   return { blob, fileName };
 }
+
+// Backwards compatibility alias
+export const buildPptxBlob = createPPTX;
 
 export { getElementRange, getLineElementPath };
 export { resolveImageData };

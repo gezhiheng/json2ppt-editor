@@ -3,7 +3,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorPanel } from './components/EditorPanel'
 import { HeaderBar } from './components/HeaderBar'
 import { PreviewPanel } from './components/PreviewPanel'
-import { buildPptxBlob } from 'json2pptx'
+import { createPPTX } from 'json2pptx'
 import { parsePptxToJson } from './lib/pptx2json'
 import {
   findTemplateById,
@@ -214,7 +214,7 @@ export default function App (): JSX.Element {
     }
     setIsExporting(true)
     try {
-      const { blob, fileName } = await buildPptxBlob(normalizedExport.deck)
+      const { blob, fileName } = await createPPTX(normalizedExport.deck)
       downloadBlob(blob, fileName)
     } finally {
       setIsExporting(false)
