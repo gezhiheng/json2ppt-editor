@@ -1,7 +1,7 @@
 import { useRef, useState, type RefObject } from 'react'
-import { Download, LayoutGrid, List, Upload } from 'lucide-react'
+import { Check, Copy, Download, LayoutGrid, List, Upload } from 'lucide-react'
+import { PPTXPreviewer } from 'pptx-previewer'
 
-import { SlidePreview } from './SlidePreview'
 import type { Deck, Slide } from '../types/ppt'
 import { Button } from './ui/button'
 import { cn } from '../lib/utils'
@@ -17,6 +17,86 @@ type PreviewPanelProps = {
   isExporting: boolean
   onImportPptx: (file: File) => void
   onExportPptx: () => void
+}
+
+type SlideCardProps = {
+  slide: Slide
+  baseWidth: number
+  baseHeight: number
+  previewWidth: number
+  index: number
+  themeBackground?: string
+}
+
+function SlideCard ({
+  slide,
+  baseWidth,
+  baseHeight,
+  previewWidth,
+  index,
+  themeBackground
+}: SlideCardProps): JSX.Element {
+  const [copied, setCopied] = useState(false)
+  const scale = previewWidth / baseWidth
+  const previewHeight = baseHeight * scale
+
+  const handleCopyId = () => {
+    if (slide.id) {
+      navigator.clipboard.writeText(slide.id)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1000)
+    }
+  }
+
+  const backgroundColor = slide.background?.color ?? themeBackground
+  const previewSlide: Slide = backgroundColor
+    ? {
+        ...slide,
+        background: {
+          ...slide.background,
+          color: backgroundColor
+        }
+      }
+    : slide
+
+  return (
+    <div
+      className='space-y-3 animate-rise'
+      style={{ animationDelay: `${index * 80}ms` }}
+    >
+      <div className='flex items-center justify-between'>
+        <div className='font-display text-sm uppercase tracking-[0.2em] text-ink-500'>
+          {slide.id && (
+            <button
+              className='group inline-flex items-center gap-1.5 rounded border border-transparent px-1.5 py-0.5 font-mono text-xs normal-case tracking-normal text-ink-400 transition-colors hover:border-ink-200 hover:bg-ink-100 hover:text-ink-700'
+              onClick={handleCopyId}
+              title='Click to copy slide ID'
+            >
+              <span>{slide.id}</span>
+              {copied ? (
+                <Check className='h-3 w-3' />
+              ) : (
+                <Copy className='h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100' />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+      <div style={{ width: previewWidth, height: previewHeight }}>
+        <div
+          className='slide-canvas'
+          style={{
+            width: baseWidth,
+            height: baseHeight,
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left'
+          }}
+        >
+          <PPTXPreviewer slide={previewSlide} />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export function PreviewPanel ({
@@ -133,15 +213,13 @@ export function PreviewPanel ({
       )}
       <div className={cn('grid gap-6', isGrid ? 'grid-cols-2' : 'grid-cols-1')}>
         {deck?.slides?.map((slide: Slide, index: number) => (
-          <SlidePreview
+          <SlideCard
             key={slide.id ?? index}
             slide={slide}
             baseWidth={slideWidth}
             baseHeight={slideHeight}
             previewWidth={isGrid ? (previewWidth - 24) / 2 : previewWidth}
             index={index}
-            slideLabel='Slide'
-            layoutLabel='layout'
             themeBackground={themeBackground}
           />
         ))}
