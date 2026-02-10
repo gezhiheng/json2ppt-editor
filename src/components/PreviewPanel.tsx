@@ -186,7 +186,7 @@ export function PreviewPanel ({
               onClick={handleUploadClick}
               disabled={isExporting || isImporting}
             >
-              <Download className='h-4 w-4' />
+              <Upload className='h-4 w-4' />
             </Button>
             <div className='absolute -right-2 -top-2 rounded-md bg-ember-500 px-1 py-0.5 text-[8px] font-bold uppercase leading-none text-white shadow-sm ring-1 ring-white'>
               Beta
@@ -199,7 +199,7 @@ export function PreviewPanel ({
             onClick={onExportPptx}
             disabled={isExporting || isImporting}
           >
-            <Upload className='h-4 w-4' />
+            <Download className='h-4 w-4' />
           </Button>
         </div>
         <div className='text-xs uppercase tracking-wider text-ink-500'>

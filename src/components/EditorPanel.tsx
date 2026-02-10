@@ -107,10 +107,10 @@ export function EditorPanel ({
             size='sm'
             className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
             onClick={handleImportClick}
-            title='Import JSON'
+            title='Upload JSON'
           >
-            <Download className='h-4 w-4' />
-            <span className='sr-only'>Import</span>
+            <Upload className='h-4 w-4' />
+            <span className='sr-only'>Upload</span>
           </Button>
           {onDownload && (
             <Button
@@ -120,7 +120,7 @@ export function EditorPanel ({
               onClick={onDownload}
               title='Download JSON'
             >
-              <Upload className='h-4 w-4' />
+              <Download className='h-4 w-4' />
               <span className='sr-only'>Download</span>
             </Button>
           )}
