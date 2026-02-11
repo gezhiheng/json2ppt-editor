@@ -6,9 +6,10 @@
   "scripts": {
     "build:json2pptx": "pnpm -C src/lib/json2pptx build",
     "build:pptx-previewer": "pnpm -C src/lib/pptx-previewer build",
+    "build:pptx-custom": "pnpm -C src/lib/pptx-custom build",
     "dev": "vite",
-    "predev": "pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer build",
-    "prebuild": "pnpm -C src/lib/json2pptx install --frozen-lockfile && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer install --frozen-lockfile && pnpm -C src/lib/pptx-previewer build",
+    "predev": "pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom build",
+    "prebuild": "pnpm -C src/lib/json2pptx install --frozen-lockfile && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer install --frozen-lockfile && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom install --frozen-lockfile && pnpm -C src/lib/pptx-custom build",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
@@ -23,6 +24,7 @@
     "lucide-react": "^0.563.0",
     "monaco-editor": "^0.52.0",
     "json2pptx": "workspace:*",
+    "pptx-custom": "workspace:*",
     "pptx-previewer": "workspace:*",
     "pptxtojson": "^1.12.0",
     "react": "^18.3.1",

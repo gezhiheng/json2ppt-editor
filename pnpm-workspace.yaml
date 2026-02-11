@@ -1,3 +1,4 @@
 packages:
   - "src/lib/json2pptx"
   - "src/lib/pptx-previewer"
+  - "src/lib/pptx-custom"

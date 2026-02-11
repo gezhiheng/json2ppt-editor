@@ -4,6 +4,7 @@ import { EditorPanel } from './components/EditorPanel'
 import { HeaderBar } from './components/HeaderBar'
 import { PreviewPanel } from './components/PreviewPanel'
 import { createPPTX } from 'json2pptx'
+import { applyCustomContent, applyCustomTheme } from 'pptx-custom'
 import { parsePptxToJson } from './lib/pptx2json'
 import {
   findTemplateById,
@@ -12,12 +13,7 @@ import {
   templateList,
   type TemplateEntry
 } from './lib/templates'
-import { applyThemeToDeck } from './lib/theme'
 import type { Deck } from './types/ppt'
-import {
-  buildTemplateFromBackend,
-  parseBackendOutput
-} from './lib/template-json-builder'
 
 const MIN_PREVIEW_WIDTH = 320
 const PREVIEW_GUTTER = 48
@@ -237,8 +233,7 @@ export default function App (): JSX.Element {
     }
 
     try {
-      const backendSlides = parseBackendOutput(content)
-      const generatedDeck = buildTemplateFromBackend(template, backendSlides)
+      const generatedDeck = applyCustomContent(template, content)
       setJsonText(JSON.stringify(generatedDeck, null, 2))
     } catch {
       alert('Invalid custom content format.')
@@ -268,7 +263,7 @@ export default function App (): JSX.Element {
       alert('JSON parse error. Fix the JSON before applying theme.')
       return
     }
-    const updated = applyThemeToDeck(current.data, {
+    const updated = applyCustomTheme(current.data, {
       themeColors,
       fontColor,
       backgroundColor

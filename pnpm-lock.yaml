@@ -35,6 +35,9 @@ importers:
       monaco-editor:
         specifier: ^0.52.0
         version: 0.52.2
+      pptx-custom:
+        specifier: workspace:*
+        version: link:src/lib/pptx-custom
       pptx-previewer:
         specifier: workspace:*
         version: link:src/lib/pptx-previewer
@@ -124,6 +127,15 @@ importers:
       vitest:
         specifier: ^1.6.0
         version: 1.6.1(@types/node@20.19.30)
+
+  src/lib/pptx-custom:
+    devDependencies:
+      tsup:
+        specifier: ^8.5.1
+        version: 8.5.1(jiti@1.21.7)(postcss@8.5.6)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
 
   src/lib/pptx-previewer:
     dependencies:
