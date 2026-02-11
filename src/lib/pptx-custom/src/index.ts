@@ -4,6 +4,7 @@ import { applyCustomTheme } from './custom-theme/index'
 export {
   parseCustomContent,
   applyCustomContent,
+  applyCustomContentToTemplate,
 
   applyCustomTheme,
 }

@@ -34,7 +34,7 @@ const deckFromSlides = applyCustomContentToTemplate(templateDeck, slides)
 
 ```
 
-## Backend Content Format
+## Custom Content Format
 
 `applyCustomContent` and `parseCustomContent` accept NDJSON-style lines or JSON arrays/objects of slides:
 
