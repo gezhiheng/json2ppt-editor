@@ -28,6 +28,44 @@ type SlideCardProps = {
   themeBackground?: string
 }
 
+function formatSlideTypeLabel (type?: string): string {
+  const rawType = type?.trim()
+  if (!rawType) return 'Standard'
+
+  return rawType
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase())
+}
+
+function getSlideTypeTone (type?: string): { chip: string, dot: string } {
+  const normalized = type?.trim().toLowerCase() ?? ''
+
+  if (normalized.includes('title') || normalized.includes('cover')) {
+    return {
+      chip: 'border-ember-400/40 bg-ember-500/10 text-ember-700',
+      dot: 'bg-ember-500'
+    }
+  }
+
+  if (
+    normalized.includes('section') ||
+    normalized.includes('chapter') ||
+    normalized.includes('divider')
+  ) {
+    return {
+      chip: 'border-slateblue-500/35 bg-slateblue-500/10 text-slateblue-500',
+      dot: 'bg-slateblue-500'
+    }
+  }
+
+  return {
+    chip: 'border-ink-200 bg-ink-50 text-ink-700',
+    dot: 'bg-ink-500'
+  }
+}
+
 function SlideCard ({
   slide,
   baseWidth,
@@ -39,6 +77,8 @@ function SlideCard ({
   const [copied, setCopied] = useState(false)
   const scale = previewWidth / baseWidth
   const previewHeight = baseHeight * scale
+  const typeTone = getSlideTypeTone(slide.type)
+  const typeLabel = formatSlideTypeLabel(slide.type)
 
   const handleCopyId = () => {
     if (slide.id) {
@@ -65,7 +105,16 @@ function SlideCard ({
       style={{ animationDelay: `${index * 80}ms` }}
     >
       <div className='flex items-center justify-between'>
-        <div className='font-display text-sm uppercase tracking-[0.2em] text-ink-500'>
+        <div className='flex w-full items-center justify-between gap-2 font-display text-sm uppercase tracking-[0.2em] text-ink-500'>
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-full border px-2 py-1 font-body text-[10px] font-semibold uppercase tracking-[0.12em] shadow-[0_1px_0_rgba(0,0,0,0.04)]',
+              typeTone.chip
+            )}
+          >
+            <span className={cn('h-1.5 w-1.5 rounded-full', typeTone.dot)} />
+            <span>{typeLabel}</span>
+          </span>
           {slide.id && (
             <button
               className='group inline-flex items-center gap-1.5 rounded border border-transparent px-1.5 py-0.5 font-mono text-xs normal-case tracking-normal text-ink-400 transition-colors hover:border-ink-200 hover:bg-ink-100 hover:text-ink-700'
