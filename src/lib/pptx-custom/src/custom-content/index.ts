@@ -6,6 +6,8 @@ export function applyCustomContent (
   template: TemplateJson,
   input: PptxCustomContentInput
 ): TemplateJson {
-  const backendSlides = typeof input === 'string' ? parseCustomContent(input) : input
-  return applyCustomContentToTemplate(template, backendSlides)
+  const CustomSlides = typeof input === 'string' ? parseCustomContent(input) : input
+  return applyCustomContentToTemplate(template, CustomSlides)
 }
+
+export { parseCustomContent, applyCustomContentToTemplate }

@@ -1,4 +1,4 @@
-import type { BackendContentItem, BackendSlide } from '../types'
+import type { BackendContentItem, CustomSlide } from '../types'
 
 type UnknownRecord = Record<string, unknown>
 
@@ -16,7 +16,7 @@ const asStringArray = (value: unknown): string[] | null => {
   return normalized.length === value.length ? normalized : null
 }
 
-const normalizeType = (value: unknown): BackendSlide['type'] | null => {
+const normalizeType = (value: unknown): CustomSlide['type'] | null => {
   const raw = asString(value)?.trim().toLowerCase()
   if (!raw) return null
   if (raw === 'agenda') return 'contents'
@@ -47,7 +47,7 @@ const normalizeContentItems = (value: unknown): BackendContentItem[] | null => {
   return normalized
 }
 
-const normalizeSlide = (value: unknown): BackendSlide | null => {
+const normalizeSlide = (value: unknown): CustomSlide | null => {
   if (!isRecord(value)) return null
   const type = normalizeType(value.type)
   if (!type) return null
@@ -109,11 +109,11 @@ const parseStructuredSlides = (raw: string): unknown[] | null => {
   return null
 }
 
-export const parseCustomContent = (raw: string): BackendSlide[] => {
+export const parseCustomContent = (raw: string): CustomSlide[] => {
   const candidates = parseStructuredSlides(raw) ?? parseNdJsonSlides(raw)
   const slides = candidates
     .map(item => normalizeSlide(item))
-    .filter((item): item is BackendSlide => item !== null)
+    .filter((item): item is CustomSlide => item !== null)
 
   if (slides.length !== candidates.length) {
     throw new Error('Invalid custom content format')

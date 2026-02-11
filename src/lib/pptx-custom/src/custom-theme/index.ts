@@ -7,3 +7,5 @@ export function applyCustomTheme (
 ): Deck {
   return applyTheme2Json(deck, input)
 }
+
+export { applyTheme2Json }

@@ -256,14 +256,14 @@ export type BackendContentData = {
   items: BackendContentItem[]
 }
 
-export type BackendSlide =
+export type CustomSlide =
   | { type: 'cover'; data: BackendCoverData }
   | { type: 'contents'; data: BackendContentsData }
   | { type: 'transition'; data: BackendTransitionData }
   | { type: 'content'; data: BackendContentData }
   | { type: 'end'; data?: undefined }
 
-export type PptxCustomContentInput = string | BackendSlide[]
+export type PptxCustomContentInput = string | CustomSlide[]
 
 export type PptxCustomThemeInput = {
   themeColors: string[]

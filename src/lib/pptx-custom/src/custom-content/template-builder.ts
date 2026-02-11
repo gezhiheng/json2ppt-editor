@@ -1,4 +1,4 @@
-import type { BackendSlide, TemplateJson, TemplateJsonSlide } from '../types'
+import type { CustomSlide, TemplateJson, TemplateJsonSlide } from '../types'
 import {
   applyContentData,
   applyContentsData,
@@ -11,7 +11,7 @@ const cloneSlide = (slide: TemplateJsonSlide): TemplateJsonSlide =>
 
 export const applyCustomContentToTemplate = (
   template: TemplateJson,
-  backendSlides: BackendSlide[]
+  CustomSlides: CustomSlide[]
 ): TemplateJson => {
   const grouped = template.slides.reduce<Record<string, TemplateJsonSlide[]>>(
     (acc, slide) => {
@@ -70,7 +70,7 @@ export const applyCustomContentToTemplate = (
   }
 
   let transitionIndex = 0
-  const slides = backendSlides.map(item => {
+  const slides = CustomSlides.map(item => {
     const desiredCount =
       item.type === 'contents'
         ? item.data.items.length
