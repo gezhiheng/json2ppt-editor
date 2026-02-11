@@ -13,7 +13,7 @@ npm i json2pptx
 ```ts
 import { createPPTX } from 'json2pptx'
 
-const deck = {
+const slide = {
   title: 'Demo',
   width: 1000,
   height: 562.5,
@@ -34,7 +34,7 @@ const deck = {
   ]
 }
 
-const { blob, fileName } = await createPPTX(deck)
+const { blob, fileName } = await createPPTX(slide)
 // 在浏览器中下载：
 // const url = URL.createObjectURL(blob)
 // const a = document.createElement('a')
