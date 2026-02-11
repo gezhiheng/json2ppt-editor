@@ -40,7 +40,9 @@ export function addTextElement(
     fontFace: element.defaultFontName || template.theme?.fontName || DEFAULT_FONT_FACE,
     color: "#000000",
     valign: "top",
-    margin: textPadding,
+    // pptxgenjs margin order: [left, right, bottom, top]
+    // Keep horizontal padding while removing vertical inset to match preview baseline.
+    margin: [textPadding, textPadding, 0, textPadding * 0.42],
     paraSpaceBefore: 0,
     lineSpacingMultiple: 1.5,
     fit: "none"

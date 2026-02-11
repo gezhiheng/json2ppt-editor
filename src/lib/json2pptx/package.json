@@ -1,11 +1,11 @@
 {
   "name": "json2pptx",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Convert JSON slide definitions to PPTX using PptxGenJS.",
   "homepage": "https://json2pptx.henryge.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gezhiheng/json2ppt-editor/tree/main/src/lib/json2pptx"
+    "url": "https://github.com/gezhiheng/json2ppt-editor/"
   },
   "license": "MIT",
   "author": "",
