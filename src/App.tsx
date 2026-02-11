@@ -14,6 +14,10 @@ import {
 } from './lib/templates'
 import { applyThemeToDeck } from './lib/theme'
 import type { Deck } from './types/ppt'
+import {
+  buildTemplateFromBackend,
+  parseBackendOutput
+} from './lib/template-json-builder'
 
 const MIN_PREVIEW_WIDTH = 320
 const PREVIEW_GUTTER = 48
@@ -226,6 +230,21 @@ export default function App (): JSX.Element {
     buildDownload(jsonText, fileName)
   }
 
+  function handleImportCustomContent (content: string): void {
+    const template = selectedTemplate?.data
+    if (!template) {
+      return
+    }
+
+    try {
+      const backendSlides = parseBackendOutput(content)
+      const generatedDeck = buildTemplateFromBackend(template, backendSlides)
+      setJsonText(JSON.stringify(generatedDeck, null, 2))
+    } catch {
+      alert('Invalid custom content format.')
+    }
+  }
+
   async function handleImportPptx (file: File): Promise<void> {
     setIsImporting(true)
     try {
@@ -281,6 +300,7 @@ export default function App (): JSX.Element {
             <EditorPanel
               value={jsonText}
               onChange={setJsonText}
+              onImportCustomContent={handleImportCustomContent}
               onDownload={handleExportJson}
             />
           </div>

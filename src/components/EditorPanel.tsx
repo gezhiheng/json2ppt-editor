@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import Editor from '@monaco-editor/react'
-import { Download, Pipette, Sparkles, Upload } from 'lucide-react'
+import { Download, FilePlus2, Pipette, Sparkles, Upload } from 'lucide-react'
 import { Button } from './ui/button'
 
 const editorOptions = {
@@ -15,15 +15,18 @@ const editorOptions = {
 type EditorPanelProps = {
   value: string
   onChange: (nextValue: string) => void
+  onImportCustomContent?: (content: string) => void
   onDownload?: () => void
 }
 
 export function EditorPanel ({
   value,
   onChange,
+  onImportCustomContent,
   onDownload
 }: EditorPanelProps): JSX.Element {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const customContentInputRef = useRef<HTMLInputElement>(null)
 
   function handleFormat () {
     try {
@@ -37,6 +40,10 @@ export function EditorPanel ({
 
   function handleImportClick () {
     fileInputRef.current?.click()
+  }
+
+  function handleImportCustomContentClick () {
+    customContentInputRef.current?.click()
   }
 
   function handleExtractTheme () {
@@ -70,6 +77,28 @@ export function EditorPanel ({
     event.target.value = ''
   }
 
+  function handleCustomContentFileChange (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.name.toLowerCase().endsWith('.txt')) {
+      alert('Custom content import only supports .txt files.')
+      event.target.value = ''
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = e => {
+      const content = e.target?.result
+      if (typeof content === 'string' && onImportCustomContent) {
+        onImportCustomContent(content)
+      }
+    }
+    reader.readAsText(file)
+    event.target.value = ''
+  }
+
   return (
     <section className='h-full flex min-h-0 flex-col rounded-xl border border-ink-200/60 bg-[#1f1b16] p-5 shadow-sharp'>
       <input
@@ -78,6 +107,13 @@ export function EditorPanel ({
         className='hidden'
         accept='.json,application/json'
         onChange={handleFileChange}
+      />
+      <input
+        type='file'
+        ref={customContentInputRef}
+        className='hidden'
+        accept='.txt,text/plain'
+        onChange={handleCustomContentFileChange}
       />
       <div className='flex items-center justify-between'>
         <h2 className='font-display text-lg text-white'>JSON Editor</h2>
@@ -101,6 +137,16 @@ export function EditorPanel ({
           >
             <Sparkles className='h-4 w-4' />
             <span className='sr-only'>Format</span>
+          </Button>
+          <Button
+            variant='secondary'
+            size='sm'
+            className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+            onClick={handleImportCustomContentClick}
+            title='Upload custom content'
+          >
+            <FilePlus2 className='h-4 w-4' />
+            <span className='sr-only'>Upload custom content</span>
           </Button>
           <Button
             variant='secondary'
