@@ -33,6 +33,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsup",
+    "dev:watch": "tsup --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "pnpm run build"
   },
