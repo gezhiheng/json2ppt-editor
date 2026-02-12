@@ -100,8 +100,8 @@ importers:
   src/lib/json2pptx:
     dependencies:
       json2pptx-schema:
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
@@ -153,8 +153,8 @@ importers:
   src/lib/pptx-custom:
     dependencies:
       json2pptx-schema:
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
     devDependencies:
       tsup:
         specifier: ^8.5.1
@@ -166,8 +166,8 @@ importers:
   src/lib/pptx-previewer:
     dependencies:
       json2pptx-schema:
-        specifier: 0.1.0
-        version: 0.1.0
+        specifier: 0.1.1
+        version: 0.1.1
       react:
         specifier: '>=18'
         version: 18.3.1
@@ -1450,8 +1450,8 @@ packages:
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
 
-  json2pptx-schema@0.1.0:
-    resolution: {integrity: sha512-nRgb8JysuzyQcfcEhBsLAHcWVETQqNvCs57QOSJsDo22KiB8FnoMORPLykbjx70T1ftOIjOCcQbP8DjWZjP+dg==}
+  json2pptx-schema@0.1.1:
+    resolution: {integrity: sha512-WySTnaG9gvpg1YAS+QeWzaGgigiHGnnizpBNG3I9Kp2egX+T9Pyk9ItZYF/ZKSGahnaUKo0BClvHfkEBx7RobQ==}
 
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
@@ -3171,7 +3171,7 @@ snapshots:
 
   json-schema-traverse@1.0.0: {}
 
-  json2pptx-schema@0.1.0:
+  json2pptx-schema@0.1.1:
     dependencies:
       ajv: 8.17.1
 
