@@ -5,7 +5,33 @@ import type {
   BackendTransitionData,
   TemplateJsonSlide
 } from '../types'
-import { setElementText } from './html'
+import { setElementText, updateHtmlContent } from './html'
+
+function setShapeTextByType (
+  slide: TemplateJsonSlide,
+  textType: string,
+  text: string
+): boolean {
+  const shape = slide.elements.find((element) => {
+    if (element.type !== 'shape') return false
+    const maybeShape = element as unknown as {
+      text?: { type?: string; content?: string }
+    }
+    return maybeShape.text?.type === textType
+  })
+
+  if (!shape) return false
+
+  const shapeWithText = shape as unknown as {
+    text?: { type?: string; content?: string }
+  }
+  if (!shapeWithText.text || typeof shapeWithText.text.content !== 'string') {
+    return false
+  }
+
+  shapeWithText.text.content = updateHtmlContent(shapeWithText.text.content, text)
+  return true
+}
 
 export const applyCoverData = (slide: TemplateJsonSlide, data: BackendCoverData) => {
   const title = slide.elements.find(
@@ -47,7 +73,12 @@ export const applyTransitionData = (
   )
   if (title) setElementText(title, data.title)
   if (content) setElementText(content, data.text)
-  if (partNumber) setElementText(partNumber, `${sectionIndex}`.padStart(2, '0'))
+  const formattedSectionIndex = `${sectionIndex}`.padStart(2, '0')
+  if (partNumber) {
+    setElementText(partNumber, formattedSectionIndex)
+  } else {
+    setShapeTextByType(slide, 'partNumber', formattedSectionIndex)
+  }
 }
 
 export const applyContentData = (slide: TemplateJsonSlide, data: BackendContentData) => {

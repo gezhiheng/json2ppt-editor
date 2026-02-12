@@ -9,6 +9,43 @@ import {
 const cloneSlide = (slide: TemplateJsonSlide): TemplateJsonSlide =>
   JSON.parse(JSON.stringify(slide)) as TemplateJsonSlide
 
+function normalizeLabel (value: string): string {
+  return value
+    .replace(/\s+/g, ' ')
+    .replace(/[，。、“”‘’：；！？【】（）《》〈〉·,.:;!?()[\]{}"'`~\-_/\\]/g, '')
+    .trim()
+    .toLowerCase()
+}
+
+function resolveTransitionIndex (
+  customSlides: CustomSlide[],
+  currentSlideIndex: number,
+  transitionTitle: string,
+  fallbackIndex: number
+): number {
+  const normalizedTitle = normalizeLabel(transitionTitle)
+  if (!normalizedTitle) return fallbackIndex
+
+  const contentsItems = customSlides
+    .slice(0, currentSlideIndex + 1)
+    .filter((slide): slide is Extract<CustomSlide, { type: 'contents' }> => slide.type === 'contents')
+    .flatMap(slide => slide.data.items)
+
+  for (let index = 0; index < contentsItems.length; index += 1) {
+    const normalizedItem = normalizeLabel(contentsItems[index])
+    if (!normalizedItem) continue
+    if (
+      normalizedItem === normalizedTitle ||
+      normalizedItem.includes(normalizedTitle) ||
+      normalizedTitle.includes(normalizedItem)
+    ) {
+      return index + 1
+    }
+  }
+
+  return fallbackIndex
+}
+
 export const applyCustomContentToTemplate = (
   template: TemplateJson,
   CustomSlides: CustomSlide[]
@@ -70,7 +107,7 @@ export const applyCustomContentToTemplate = (
   }
 
   let transitionIndex = 0
-  const slides = CustomSlides.map(item => {
+  const slides = CustomSlides.map((item, index) => {
     const desiredCount =
       item.type === 'contents'
         ? item.data.items.length
@@ -84,7 +121,13 @@ export const applyCustomContentToTemplate = (
       applyContentsData(slide, item.data)
     } else if (item.type === 'transition') {
       transitionIndex += 1
-      applyTransitionData(slide, item.data, transitionIndex)
+      const partNumber = resolveTransitionIndex(
+        CustomSlides,
+        index,
+        item.data.title,
+        transitionIndex
+      )
+      applyTransitionData(slide, item.data, partNumber)
     } else if (item.type === 'content') {
       applyContentData(slide, item.data)
     }
