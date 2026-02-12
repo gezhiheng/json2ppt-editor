@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { SchemaValidationError } from 'json2pptx-schema'
 import { createPPTX } from '../src/lib/json2pptx/src/index'
 import { preparePreviewSlide } from '../src/lib/pptx-previewer/src/PPTXPreviewer'
 import { applyCustomTheme } from '../src/lib/pptx-custom/src/custom-theme/index'
@@ -11,7 +10,16 @@ describe('schema integration', () => {
         title: 'broken',
         theme: {}
       } as any)
-    ).rejects.toBeInstanceOf(SchemaValidationError)
+    ).rejects.toMatchObject({
+      name: 'SchemaValidationError',
+      issues: [
+        expect.objectContaining({
+          code: 'SCHEMA_VALIDATION_ERROR',
+          path: expect.any(String),
+          message: expect.any(String)
+        })
+      ]
+    })
   })
 
   it('pptx-previewer prepares slide through parse pipeline', () => {
