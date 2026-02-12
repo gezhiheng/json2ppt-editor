@@ -1,6 +1,6 @@
 {
   "name": "pptx-previewer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A React component to preview PPTX JSON slides in the browser.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -39,6 +39,9 @@
   },
   "peerDependencies": {
     "react": ">=18"
+  },
+  "dependencies": {
+    "json2pptx-schema": "0.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

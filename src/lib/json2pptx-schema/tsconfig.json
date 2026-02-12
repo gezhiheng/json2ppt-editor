@@ -3,15 +3,15 @@
     "target": "ES2020",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2020", "DOM"],
-    "resolveJsonModule": true,
+    "lib": ["ES2020"],
     "strict": true,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["src", "tsup.config.ts"]
+  "include": ["index.ts", "runtime/**/*.ts", "versions/**/*.ts", "versions/**/*.json", "tsup.config.ts"]
 }

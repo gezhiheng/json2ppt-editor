@@ -1,14 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { parseBackendOutput } from '../src/lib/template-json-builder'
+import { parseCustomContent } from '../src/lib/pptx-custom'
 
 function loadCustomContentFixture (): string {
-  return readFileSync('src/mock/custom-content-example', 'utf8')
+  return readFileSync('src/mock/custom-content-example.txt', 'utf8')
 }
 
-describe('parseBackendOutput', () => {
+describe('parseCustomContent', () => {
   it('parses NDJSON custom content format', () => {
-    const slides = parseBackendOutput(loadCustomContentFixture())
+    const slides = parseCustomContent(loadCustomContentFixture())
 
     expect(slides.length).toBeGreaterThan(1)
     expect(slides[0]).toEqual({
@@ -27,7 +27,7 @@ describe('parseBackendOutput', () => {
       { type: 'end' }
     ])
 
-    const slides = parseBackendOutput(raw)
+    const slides = parseCustomContent(raw)
     expect(slides).toEqual([
       { type: 'cover', data: { title: 'T', text: 'D' } },
       { type: 'end' }
@@ -43,7 +43,7 @@ describe('parseBackendOutput', () => {
       ]
     })
 
-    const slides = parseBackendOutput(raw)
+    const slides = parseCustomContent(raw)
     expect(slides).toEqual([
       { type: 'contents', data: { items: ['A', 'B'] } },
       { type: 'transition', data: { title: 'S1', text: 'desc' } },
@@ -53,7 +53,7 @@ describe('parseBackendOutput', () => {
 
   it('throws on invalid custom content shape', () => {
     expect(() =>
-      parseBackendOutput(
+      parseCustomContent(
         JSON.stringify([{ type: 'content', data: { title: 'T', items: [] } }, { foo: 'bar' }])
       )
     ).toThrow('Invalid custom content format')

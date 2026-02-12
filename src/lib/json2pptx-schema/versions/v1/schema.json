@@ -1,0 +1,653 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://json2pptx.dev/json2pptx-schema/v1",
+  "title": "json2pptx document schema v1",
+  "type": "object",
+  "required": [
+    "slides"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "version": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "width": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "height": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "theme": {
+      "$ref": "#/definitions/theme"
+    },
+    "slides": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/slide"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "shadow": {
+      "type": "object",
+      "required": [
+        "h",
+        "v",
+        "blur",
+        "color"
+      ],
+      "properties": {
+        "h": {
+          "type": "number"
+        },
+        "v": {
+          "type": "number"
+        },
+        "blur": {
+          "type": "number"
+        },
+        "color": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "outline": {
+      "type": "object",
+      "required": [
+        "width",
+        "color",
+        "style"
+      ],
+      "properties": {
+        "width": {
+          "type": "number"
+        },
+        "color": {
+          "type": "string"
+        },
+        "style": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "gradientStop": {
+      "type": "object",
+      "required": [
+        "pos",
+        "color"
+      ],
+      "properties": {
+        "pos": {
+          "type": "number"
+        },
+        "color": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "gradient": {
+      "type": "object",
+      "required": [
+        "type",
+        "rotate",
+        "colors"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "rotate": {
+          "type": "number"
+        },
+        "colors": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/definitions/gradientStop"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "themeColors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fontColor": {
+          "type": "string"
+        },
+        "fontName": {
+          "type": "string"
+        },
+        "backgroundColor": {
+          "type": "string"
+        },
+        "shadow": {
+          "$ref": "#/definitions/shadow"
+        },
+        "outline": {
+          "$ref": "#/definitions/outline"
+        }
+      },
+      "additionalProperties": true
+    },
+    "pair": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "linePoints": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string"
+      }
+    },
+    "shapeText": {
+      "type": "object",
+      "required": [
+        "content"
+      ],
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "defaultColor": {
+          "type": "string"
+        },
+        "defaultFontName": {
+          "type": "string"
+        },
+        "align": {
+          "type": "string"
+        },
+        "lineHeight": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "clip": {
+      "type": "object",
+      "required": [
+        "shape",
+        "range"
+      ],
+      "properties": {
+        "shape": {
+          "type": "string"
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/definitions/pair"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "opacity": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "grayscale": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "blur": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "sepia": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "saturate": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "tableCellStyle": {
+      "type": "object",
+      "properties": {
+        "fontname": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "align": {
+          "type": "string"
+        },
+        "fontsize": {
+          "type": "string"
+        },
+        "backcolor": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "tableCell": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "colspan": {
+          "type": "number"
+        },
+        "rowspan": {
+          "type": "number"
+        },
+        "text": {
+          "type": "string"
+        },
+        "style": {
+          "$ref": "#/definitions/tableCellStyle"
+        }
+      },
+      "additionalProperties": true
+    },
+    "element": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "groupId": {
+          "type": "string"
+        },
+        "left": {
+          "type": "number"
+        },
+        "top": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "rotate": {
+          "type": "number"
+        },
+        "lock": {
+          "type": "boolean"
+        },
+        "opacity": {
+          "type": "number"
+        },
+        "flipH": {
+          "type": "boolean"
+        },
+        "flipV": {
+          "type": "boolean"
+        },
+        "shadow": {
+          "$ref": "#/definitions/shadow"
+        },
+        "outline": {
+          "$ref": "#/definitions/outline"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "text"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "content",
+              "left",
+              "top",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "content": {
+                "type": "string"
+              },
+              "defaultColor": {
+                "type": "string"
+              },
+              "defaultFontName": {
+                "type": "string"
+              },
+              "fill": {
+                "type": "string"
+              },
+              "lineHeight": {
+                "type": "number"
+              },
+              "paragraphSpace": {
+                "type": "number"
+              },
+              "textType": {
+                "type": "string"
+              },
+              "vertical": {
+                "type": "boolean"
+              },
+              "wordSpace": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "shape"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "path",
+              "viewBox",
+              "fill",
+              "left",
+              "top",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "viewBox": {
+                "$ref": "#/definitions/pair"
+              },
+              "fill": {
+                "type": "string"
+              },
+              "fixedRatio": {
+                "type": "boolean"
+              },
+              "keypoints": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "pathFormula": {
+                "type": "string"
+              },
+              "gradient": {
+                "$ref": "#/definitions/gradient"
+              },
+              "special": {
+                "type": "boolean"
+              },
+              "text": {
+                "$ref": "#/definitions/shapeText"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "line"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "start",
+              "end",
+              "points",
+              "color",
+              "width",
+              "left",
+              "top"
+            ],
+            "properties": {
+              "start": {
+                "$ref": "#/definitions/pair"
+              },
+              "end": {
+                "$ref": "#/definitions/pair"
+              },
+              "points": {
+                "$ref": "#/definitions/linePoints"
+              },
+              "broken": {
+                "$ref": "#/definitions/pair"
+              },
+              "color": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              },
+              "width": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "image"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "src",
+              "left",
+              "top",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "src": {
+                "type": "string"
+              },
+              "fixedRatio": {
+                "type": "boolean"
+              },
+              "clip": {
+                "$ref": "#/definitions/clip"
+              },
+              "filters": {
+                "$ref": "#/definitions/filters"
+              },
+              "imageType": {
+                "type": "string"
+              },
+              "radius": {
+                "type": "number"
+              },
+              "colorMask": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "table"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "left",
+              "top",
+              "width",
+              "height"
+            ],
+            "properties": {
+              "colWidths": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/tableCell"
+                  }
+                }
+              },
+              "cellMinHeight": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": true
+    },
+    "slideBackground": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "color": {
+          "type": "string"
+        },
+        "src": {
+          "type": "string"
+        },
+        "gradient": {
+          "$ref": "#/definitions/gradient"
+        }
+      },
+      "additionalProperties": true
+    },
+    "slide": {
+      "type": "object",
+      "required": [
+        "elements"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "remark": {
+          "type": "string"
+        },
+        "background": {
+          "$ref": "#/definitions/slideBackground"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/element"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

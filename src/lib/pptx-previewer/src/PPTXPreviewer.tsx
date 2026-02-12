@@ -1,9 +1,31 @@
-import { renderElement } from './renderers';
-import type { PPTXPreviewerProps } from './types';
-import { getElementSize } from './utils/elementSize';
-import { getFlipTransform, getShadowFilter } from './utils/elementStyle';
+import { useMemo } from 'react'
+import { parseDocument } from 'json2pptx-schema'
+import { renderElement } from './renderers'
+import type { PPTXPreviewerProps, Slide } from './types'
+import { getElementSize } from './utils/elementSize'
+import { getFlipTransform, getShadowFilter } from './utils/elementStyle'
 
-export function PPTXPreviewer({ slide, className }: PPTXPreviewerProps) {
+const PREVIEW_WIDTH = 1000
+const PREVIEW_HEIGHT = 562.5
+
+export function preparePreviewSlide (slide: Slide): Slide {
+  try {
+    const parsed = parseDocument({
+      title: 'Preview',
+      width: PREVIEW_WIDTH,
+      height: PREVIEW_HEIGHT,
+      theme: {},
+      slides: [slide]
+    })
+    return parsed.slides[0] as unknown as Slide
+  } catch {
+    return slide
+  }
+}
+
+export function PPTXPreviewer ({ slide, className }: PPTXPreviewerProps) {
+  const preparedSlide = useMemo(() => preparePreviewSlide(slide), [slide])
+
   return (
     <div
       className={className}
@@ -16,19 +38,19 @@ export function PPTXPreviewer({ slide, className }: PPTXPreviewerProps) {
         lineHeight: 'normal'
       }}
     >
-      {slide.background?.color ? (
+      {preparedSlide.background?.color ? (
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: slide.background.color
+            backgroundColor: preparedSlide.background.color
           }}
         />
       ) : null}
 
-      {(slide.elements ?? []).map((element, elementIndex) => {
-        const size = getElementSize(element);
-        const markerId = element.id ?? `line-${elementIndex}`;
+      {(preparedSlide.elements ?? []).map((element, elementIndex) => {
+        const size = getElementSize(element)
+        const markerId = element.id ?? `line-${elementIndex}`
 
         return (
           <div
@@ -45,7 +67,9 @@ export function PPTXPreviewer({ slide, className }: PPTXPreviewerProps) {
               style={{
                 width: '100%',
                 height: '100%',
-                transform: element.rotate ? `rotate(${element.rotate}deg)` : undefined
+                transform: element.rotate
+                  ? `rotate(${element.rotate}deg)`
+                  : undefined
               }}
             >
               <div
@@ -65,8 +89,8 @@ export function PPTXPreviewer({ slide, className }: PPTXPreviewerProps) {
               </div>
             </div>
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

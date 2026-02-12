@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   plugins: [react()],
@@ -7,6 +8,9 @@ export default defineConfig({
     alias: {
       buffer: "buffer",
       process: "process/browser",
+      "json2pptx-schema": fileURLToPath(
+        new URL("./src/lib/json2pptx-schema/index.ts", import.meta.url)
+      ),
     },
   },
   define: {

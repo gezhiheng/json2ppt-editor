@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { applyTheme2Json } from '../src/lib/theme'
+import { applyCustomTheme } from '../src/lib/pptx-custom'
 import type { Deck } from '../src/types/ppt'
 
 function loadSlideFixture () {
@@ -34,7 +34,7 @@ describe('applyTheme2Json', () => {
     const slide = loadSlideFixture()
     const deck = buildDeck(slide)
 
-    const updated = applyTheme2Json(deck, {
+    const updated = applyCustomTheme(deck, {
       themeColors: ['#E87D7D'],
       fontColor: 'rgb(51, 51, 51)'
   })
@@ -58,7 +58,7 @@ it('applies font color to html content and defaultColor', () => {
   const slide = loadFontColorFixture()
   const deck = buildDeck(slide)
 
-  const updated = applyTheme2Json(deck, {
+  const updated = applyCustomTheme(deck, {
     themeColors: ['rgb(155, 0, 0)'],
     fontColor: '#123456'
   })

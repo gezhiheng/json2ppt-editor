@@ -1,0 +1,5 @@
+{"type":"cover","data":{"title":"2025科技前沿动态","text":"洞察全球科技创新趋势，展望未来产业变革方向"}}
+{"type":"contents","data":{"items":["人工智能","机器人","新材料"]}}
+{"type":"transition","data":{"title":"人工智能","text":"技术演进与产业机会"}}
+{"type":"content","data":{"title":"行业观察","items":[{"title":"趋势一","text":"多模态模型持续成熟"},{"title":"趋势二","text":"智能体应用快速落地"}]}}
+{"type":"end"}

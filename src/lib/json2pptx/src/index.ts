@@ -1,10 +1,10 @@
 import PptxGenJS from "pptxgenjs";
 import JSZip from "jszip";
+import { parseDocument } from "json2pptx-schema";
 
 import type { Deck } from "./types/ppt";
 import { getElementRange, getLineElementPath } from "./element";
 import { resolveImageData } from "./resolveImageData";
-import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from "./renderers/constants";
 import { applySlideBackground } from "./renderers/background";
 import { applyPptxLayout } from "./renderers/layout";
 import {
@@ -103,23 +103,26 @@ function parseDataUrlImage(
 export async function createPPTX(
   template: Deck
 ): Promise<{ blob: Blob; fileName: string }> {
+  const parsedTemplate = parseDocument(template);
+  const renderTemplate = parsedTemplate as unknown as Deck;
+
   const pptx = new PptxGenJS();
   const patternShapes: PatternShape[] = [];
 
-  const width = template.width ?? DEFAULT_WIDTH;
-  const height = template.height ?? DEFAULT_HEIGHT;
+  const width = parsedTemplate.width;
+  const height = parsedTemplate.height;
   const ratioPx2Inch = 96 * (width / 960);
   const ratioPx2Pt = (96 / 72) * (width / 960);
   const textPadding = 10 / ratioPx2Pt;
 
   applyPptxLayout(pptx, width, height);
 
-  for (const [slideIndex, slideJson] of (template.slides ?? []).entries()) {
+  for (const [slideIndex, slideJson] of (renderTemplate.slides ?? []).entries()) {
     const slide = pptx.addSlide();
-    applySlideBackground(slide, slideJson, template.theme);
+    applySlideBackground(slide, slideJson, renderTemplate.theme);
 
     for (const [elementIndex, element] of (slideJson.elements ?? []).entries()) {
-      addTextElement(slide, element, template, ratioPx2Pt, ratioPx2Inch, textPadding);
+      addTextElement(slide, element, renderTemplate, ratioPx2Pt, ratioPx2Inch, textPadding);
       await addImageElement(slide, element, ratioPx2Inch);
       addShapeElement(
         slide,
@@ -135,7 +138,7 @@ export async function createPPTX(
     }
   }
 
-  const fileName = `${sanitizeFileName(template.title ?? "presentation")}.pptx`;
+  const fileName = `${sanitizeFileName(parsedTemplate.title || "presentation")}.pptx`;
   const pptxBuffer = (await pptx.write({
     outputType: "arraybuffer",
     compression: true
@@ -216,7 +219,7 @@ export async function createPPTX(
       JSON.stringify(
         {
           version: PPTX_JSON_PAYLOAD_VERSION,
-          deck: template
+          deck: parsedTemplate
         },
         null,
         2
