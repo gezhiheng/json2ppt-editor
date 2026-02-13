@@ -1,5 +1,7 @@
 # JSON2PPT Editor
 
+[中文](./README.zh-CN.md)
+
 A single-page app that turns JSON slide data into a live preview and exports PPTX files with PptxGenJS. It ships with a Monaco-based JSON editor, real-time slide preview, and a template selector that reads JSON files from `/mock`.
 
 ## Features
@@ -19,6 +21,17 @@ A single-page app that turns JSON slide data into a live preview and exports PPT
 - PptxGenJS
 - Monaco Editor
 
+## Core dependencies
+
+- Related npm packages:
+  - [`json2pptx`](https://www.npmjs.com/package/json2pptx)
+  - [`json2pptx-schema`](https://www.npmjs.com/package/json2pptx-schema)
+  - [`pptx-custom`](https://www.npmjs.com/package/pptx-custom)
+  - [`pptx-previewer`](https://www.npmjs.com/package/pptx-previewer)
+- Runtime app: `react`, `react-dom`, `vite`
+- Editor/UI: `monaco-editor`, `@monaco-editor/react`, `lucide-react`, `@radix-ui/react-select`
+- Styling utilities: `tailwindcss`, `tailwind-merge`, `class-variance-authority`, `clsx`
+
 ## Project Structure
 
 - `mock/` JSON templates loaded into the selector
@@ -31,13 +44,13 @@ A single-page app that turns JSON slide data into a live preview and exports PPT
 ### 1) Install dependencies
 
 ```bash
-npm install
+pnpm i
 ```
 
 ### 2) Start the dev server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## Usage
@@ -59,11 +72,3 @@ Templates in this repo are sourced from [PPTist](https://github.com/pipipi-pikac
 - The preview uses the `width` and `height` from the JSON to maintain aspect ratio.
 - The PPTX export is a best-effort mapping of shapes, text, images, and lines.
 - Remote images in templates must be publicly accessible for PPTX export.
-
-## Scripts
-
-```bash
-npm run dev
-npm run build
-npm run preview
-```
