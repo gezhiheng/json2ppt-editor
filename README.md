@@ -26,6 +26,7 @@ A single-page app that turns JSON slide data into a live preview and exports PPT
 - Related npm packages:
   - [`json2pptx`](https://www.npmjs.com/package/json2pptx)
   - [`json2pptx-schema`](https://www.npmjs.com/package/json2pptx-schema)
+  - [`ppt2json`](https://www.npmjs.com/package/ppt2json)
   - [`pptx-custom`](https://www.npmjs.com/package/pptx-custom)
   - [`pptx-previewer`](https://www.npmjs.com/package/pptx-previewer)
 - Runtime app: `react`, `react-dom`, `vite`
