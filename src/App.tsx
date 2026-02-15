@@ -245,13 +245,14 @@ export default function App (): JSX.Element {
   }
 
   function handleImportCustomContent (content: string): void {
-    const template = selectedTemplate?.data
-    if (!template) {
+    const current = safeParse(jsonText)
+    if (!current.data) {
+      alert('JSON parse error. Fix the JSON before applying custom content.')
       return
     }
 
     try {
-      const generatedDeck = applyCustomContent(template, content)
+      const generatedDeck = applyCustomContent(current.data, content)
       setCustomContentText(content)
       setJsonText(JSON.stringify(generatedDeck, null, 2))
     } catch {
