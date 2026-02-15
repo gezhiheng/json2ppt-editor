@@ -2,7 +2,12 @@
 
 [中文](./README.zh-CN.md)
 
-A single-page app that turns JSON slide data into a live preview and exports PPTX files with PptxGenJS. It ships with a Monaco-based JSON editor, real-time slide preview, and a template selector that reads JSON files from `/mock`.
+## Introduction
+
+JSON2PPT Editor is a local-first slide editing app for JSON-based decks.  
+You can pick a template, edit slide JSON with Monaco, preview changes instantly, apply custom content/theme transforms, and export to PPTX.
+
+A single-page app that turns JSON slide data into a live preview and exports PPTX files with PptxGenJS. It ships with a Monaco-based JSON editor, real-time slide preview, and a template selector that reads JSON files from `/template`.
 
 ## Features
 
@@ -54,11 +59,42 @@ pnpm i
 pnpm dev
 ```
 
+## Common Commands
+
+Use these in `/Users/henry/codebase/personal/json2ppt-editor`:
+
+```bash
+# App dev server (Vite HMR for app code)
+pnpm dev
+
+# Watch all workspace libs + app together (recommended for lib development + HMR)
+pnpm dev:workspace
+
+# Watch workspace libs only (json2pptx, schema, pptx-previewer, pptx-custom, pptx2json)
+pnpm dev:libs
+
+# Run tests
+pnpm test
+
+# Build production app bundle
+pnpm build
+
+# Preview production build locally
+pnpm preview
+
+# Build specific workspace packages
+pnpm build:schema
+pnpm build:json2pptx
+pnpm build:ppt2json
+pnpm build:pptx-previewer
+pnpm build:pptx-custom
+```
+
 ## Usage
 
 ### Choose a template
 
-Add JSON templates to `mock/` (e.g. `mock/template_2.json`). Restart the dev server to refresh the template list.
+Add JSON templates to `template/` (e.g. `template/template_2.json`). Restart the dev server to refresh the template list.
 Templates in this repo are sourced from [PPTist](https://github.com/pipipi-pikachu/PPTist).
 
 ### Export / Import
