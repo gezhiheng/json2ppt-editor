@@ -81,17 +81,15 @@ function reorderSlideIdFirst (slide: Deck['slides'][number], id: string) {
 function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
   if (!deck.slides?.length) return { deck, changed: false }
   let changed = false
-  const existing = new Set<string>(
-    deck.slides.map((slide) => slide.id).filter(Boolean) as string[]
-  )
+  const used = new Set<string>()
   const slides = deck.slides.map((slide) => {
-    const hasId = Boolean(slide.id)
-    const id = slide.id ?? generateSlideId(existing)
+    const hasUniqueId = Boolean(slide.id) && !used.has(slide.id as string)
+    const id = hasUniqueId ? (slide.id as string) : generateSlideId(used)
+    used.add(id)
     const firstKey = Object.keys(slide)[0]
     const needsReorder = firstKey !== 'id'
-    if (!hasId || needsReorder) {
+    if (!hasUniqueId || needsReorder) {
       changed = true
-      existing.add(id)
       return reorderSlideIdFirst(slide, id)
     }
     return slide
@@ -101,6 +99,7 @@ function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
 
 export default function App (): JSX.Element {
   const [jsonText, setJsonText] = useState(initialJson)
+  const [customContentText, setCustomContentText] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
   const [previewWidth, setPreviewWidth] = useState(720)
@@ -134,6 +133,25 @@ export default function App (): JSX.Element {
     const template = getTemplateOrFallback(templateId)
     if (!template) return
     setSelectedTemplateId(template.id)
+    if (!customContentText) {
+      setJsonText(JSON.stringify(template.data, null, 2))
+      return
+    }
+
+    try {
+      const generatedDeck = applyCustomContent(template.data, customContentText)
+      setJsonText(JSON.stringify(generatedDeck, null, 2))
+    } catch {
+      setJsonText(JSON.stringify(template.data, null, 2))
+      alert('Invalid custom content format.')
+    }
+  }
+
+  function resetToOriginalTemplate (templateId: string): void {
+    const template = getTemplateOrFallback(templateId)
+    if (!template) return
+    setSelectedTemplateId(template.id)
+    setCustomContentText(null)
     setJsonText(JSON.stringify(template.data, null, 2))
   }
 
@@ -234,6 +252,7 @@ export default function App (): JSX.Element {
 
     try {
       const generatedDeck = applyCustomContent(template, content)
+      setCustomContentText(content)
       setJsonText(JSON.stringify(generatedDeck, null, 2))
     } catch {
       alert('Invalid custom content format.')
@@ -280,7 +299,9 @@ export default function App (): JSX.Element {
           selectedTemplateId={selectedTemplate?.id ?? ''}
           jsonError={parsed.error}
           onTemplateChange={applyTemplate}
-          onResetTemplate={() => applyTemplate(selectedTemplate?.id ?? '')}
+          onResetTemplate={() =>
+            resetToOriginalTemplate(selectedTemplate?.id ?? '')
+          }
           onApplyTheme={handleApplyTheme}
         />
 

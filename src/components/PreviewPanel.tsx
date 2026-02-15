@@ -263,7 +263,7 @@ export function PreviewPanel ({
       <div className={cn('grid gap-6', isGrid ? 'grid-cols-2' : 'grid-cols-1')}>
         {deck?.slides?.map((slide: Slide, index: number) => (
           <SlideCard
-            key={slide.id ?? index}
+            key={`${slide.id ?? 'slide'}-${index}`}
             slide={slide}
             baseWidth={slideWidth}
             baseHeight={slideHeight}
