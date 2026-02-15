@@ -15,7 +15,7 @@ import {
   addTextElement
 } from "./renderers/elements";
 import { type PatternShape } from "./renderers/types";
-export const ENABLE_DECK_JSON = true;
+export const ENABLE_DECK_JSON = false;
 export const PPTX_JSON_PAYLOAD_PATH = "json2ppt-editor.json";
 export const PPTX_JSON_PAYLOAD_VERSION = 1;
 
@@ -144,7 +144,7 @@ export async function createPPTX(
     compression: true
   })) as ArrayBuffer;
 
-  const needsZip = ENABLE_DECK_JSON || patternShapes.length > 0;
+  const needsZip = patternShapes.length > 0;
   if (!needsZip) {
     return { blob: new Blob([pptxBuffer]), fileName };
   }
@@ -213,19 +213,6 @@ export async function createPPTX(
     }
   }
 
-  if (ENABLE_DECK_JSON) {
-    zip.file(
-      PPTX_JSON_PAYLOAD_PATH,
-      JSON.stringify(
-        {
-          version: PPTX_JSON_PAYLOAD_VERSION,
-          deck: parsedTemplate
-        },
-        null,
-        2
-      )
-    );
-  }
   const blob = await zip.generateAsync({ type: "blob" });
   return { blob, fileName };
 }
