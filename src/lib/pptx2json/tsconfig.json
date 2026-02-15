@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
+  },
+  "include": [
+    "index.ts",
+    "types.ts",
+    "utils.ts",
+    "slide-normalizer.ts",
+    "element-mapper.ts",
+    "parser/pptxtojson.ts",
+    "parser/pptxtojson.d.ts",
+    "tsup.config.ts"
+  ]
+}

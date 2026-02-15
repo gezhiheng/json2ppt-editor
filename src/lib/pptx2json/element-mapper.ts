@@ -1,4 +1,4 @@
-import type { SlideElement } from "../../types/ppt";
+import type { SlideElement } from './types'
 import {
   buildCutRectDiagonalPath,
   buildEllipsePath,

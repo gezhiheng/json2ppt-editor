@@ -6,19 +6,22 @@
   "scripts": {
     "build:schema": "pnpm -C src/lib/json2pptx-schema build",
     "build:json2pptx": "pnpm -C src/lib/json2pptx build",
+    "build:ppt2json": "pnpm -C src/lib/pptx2json build",
     "build:pptx-previewer": "pnpm -C src/lib/pptx-previewer build",
     "build:pptx-custom": "pnpm -C src/lib/pptx-custom build",
     "dev": "vite",
     "dev:watch": "vite",
-    "dev:libs": "pnpm -r --parallel --stream --filter json2pptx-schema --filter json2pptx --filter pptx-previewer --filter pptx-custom run dev:watch",
-    "dev:workspace": "pnpm -r --parallel --stream --filter json2ppt-editor --filter json2pptx-schema --filter json2pptx --filter pptx-previewer --filter pptx-custom run dev:watch",
-    "predev": "pnpm -C src/lib/json2pptx-schema build && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom build",
-    "prebuild": "pnpm -C src/lib/json2pptx-schema install --frozen-lockfile && pnpm -C src/lib/json2pptx-schema build && pnpm -C src/lib/json2pptx install --frozen-lockfile && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx-previewer install --frozen-lockfile && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom install --frozen-lockfile && pnpm -C src/lib/pptx-custom build",
+    "dev:libs": "pnpm -r --parallel --stream --filter json2pptx-schema --filter json2pptx --filter ppt2json --filter pptx-previewer --filter pptx-custom run dev:watch",
+    "dev:workspace": "pnpm -r --parallel --stream --filter json2ppt-editor --filter json2pptx-schema --filter json2pptx --filter ppt2json --filter pptx-previewer --filter pptx-custom run dev:watch",
+    "predev": "pnpm -C src/lib/json2pptx-schema build && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx2json build && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom build",
+    "prebuild": "pnpm -C src/lib/json2pptx-schema install --frozen-lockfile && pnpm -C src/lib/json2pptx-schema build && pnpm -C src/lib/json2pptx install --frozen-lockfile && pnpm -C src/lib/json2pptx build && pnpm -C src/lib/pptx2json install --frozen-lockfile && pnpm -C src/lib/pptx2json build && pnpm -C src/lib/pptx-previewer install --frozen-lockfile && pnpm -C src/lib/pptx-previewer build && pnpm -C src/lib/pptx-custom install --frozen-lockfile && pnpm -C src/lib/pptx-custom build",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "pack:schema": "pnpm -C src/lib/json2pptx-schema pack",
-    "publish:schema": "pnpm -C src/lib/json2pptx-schema publish --access public"
+    "publish:schema": "pnpm -C src/lib/json2pptx-schema publish --access public",
+    "pack:ppt2json": "pnpm -C src/lib/pptx2json pack",
+    "publish:ppt2json": "pnpm -C src/lib/pptx2json publish --access public"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",

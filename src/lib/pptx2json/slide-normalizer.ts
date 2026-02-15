@@ -1,6 +1,6 @@
-import type { Slide } from "../../types/ppt";
-import { flattenElements, normalizeElement } from "./element-mapper";
-import { mapFill } from "./utils";
+import type { Slide } from './types'
+import { flattenElements, normalizeElement } from './element-mapper'
+import { mapFill } from './utils'
 
 const ID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
 
