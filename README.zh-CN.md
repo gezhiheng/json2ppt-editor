@@ -61,8 +61,6 @@ pnpm dev
 
 ## 常用命令
 
-在 `/Users/henry/codebase/personal/json2ppt-editor` 目录执行：
-
 ```bash
 # 应用开发服务器（Vite HMR，适合改页面/应用代码）
 pnpm dev

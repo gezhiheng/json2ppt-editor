@@ -61,8 +61,6 @@ pnpm dev
 
 ## Common Commands
 
-Use these in `/Users/henry/codebase/personal/json2ppt-editor`:
-
 ```bash
 # App dev server (Vite HMR for app code)
 pnpm dev
