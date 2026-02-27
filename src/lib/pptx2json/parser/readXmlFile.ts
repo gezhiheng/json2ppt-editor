@@ -1,4 +1,4 @@
-import * as txml from 'txml'
+import { parse as parseXml } from 'txml/txml'
 import type { AnyRecord, XmlNode } from './types'
 
 let cust_attr_order = 0
@@ -50,7 +50,7 @@ export function simplifyLostLess(children: Array<unknown>, parentAttributes: Any
 export async function readXmlFile(zip: AnyRecord, filename: string): Promise<XmlNode | null> {
   try {
     const data = await (zip.file(filename) as AnyRecord).async('string')
-    return simplifyLostLess(txml.parse(data) as Array<unknown>)
+    return simplifyLostLess(parseXml(data) as Array<unknown>)
   }
   catch {
     return null

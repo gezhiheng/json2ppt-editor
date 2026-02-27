@@ -5,8 +5,8 @@ import {
   PPTX_JSON_PAYLOAD_VERSION
 } from 'json2pptx'
 import type { Deck } from './types'
-import { parse } from './parser/pptxtojson'
-import type { PptxParseResult } from './parser/pptxtojson'
+import { parse } from './parser/parse'
+import type { PptxParseResult } from './parser/parse'
 import { normalizeSlide } from './slide-normalizer'
 import { mapColor, toPx } from './utils'
 

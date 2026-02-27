@@ -44,9 +44,6 @@ importers:
       pptx-previewer:
         specifier: workspace:*
         version: link:src/lib/pptx-previewer
-      pptxtojson:
-        specifier: ^1.12.0
-        version: 1.12.0
       process:
         specifier: ^0.11.10
         version: 0.11.10
@@ -190,9 +187,6 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
-      pptxtojson:
-        specifier: ^1.12.0
-        version: 1.12.0
     devDependencies:
       '@types/node':
         specifier: ^22.10.2
@@ -1682,9 +1676,6 @@ packages:
 
   pptxgenjs@3.12.0:
     resolution: {integrity: sha512-ZozkYKWb1MoPR4ucw3/aFYlHkVIJxo9czikEclcUVnS4Iw/M+r+TEwdlB3fyAWO9JY1USxJDt0Y0/r15IR/RUA==}
-
-  pptxtojson@1.12.0:
-    resolution: {integrity: sha512-kXdCqXlCLdiGpM3womaQIpGYrQEzl8/jdxSpWWtYNj3Pxvr9n39tGpuBxeZSdenttwzM7Fb/yBKUPzxMFXLIJQ==}
 
   pretty-format@29.7.0:
     resolution: {integrity: sha512-Pdlw/oPxN+aXdmM9R00JVC9WVFoCLTKJvDVLgmJ+qAffBMxsV85l/Lu7sNx4zSzPyoL2euImuEwHhOXdEgNFZQ==}
@@ -3380,12 +3371,6 @@ snapshots:
       https: 1.0.0
       image-size: 1.2.1
       jszip: 3.10.1
-
-  pptxtojson@1.12.0:
-    dependencies:
-      jszip: 3.10.1
-      tinycolor2: 1.6.0
-      txml: 5.2.1
 
   pretty-format@29.7.0:
     dependencies:
