@@ -89,6 +89,7 @@ export function HeaderBar ({
             variant='secondary'
             className={cn('gap-2', commonTriggerClass)}
             disabled={isThemeDisabled}
+            aria-label='Open theme settings'
           >
             <Palette className='h-4 w-4' />
             Theme

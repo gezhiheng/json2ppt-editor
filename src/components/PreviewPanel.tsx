@@ -120,6 +120,7 @@ function SlideCard ({
               className='group inline-flex items-center gap-1.5 rounded border border-transparent px-1.5 py-0.5 font-mono text-xs normal-case tracking-normal text-ink-400 transition-colors hover:border-ink-200 hover:bg-ink-100 hover:text-ink-700'
               onClick={handleCopyId}
               title='Click to copy slide ID'
+              aria-label='Copy slide ID'
             >
               <span>{slide.id}</span>
               {copied ? (
