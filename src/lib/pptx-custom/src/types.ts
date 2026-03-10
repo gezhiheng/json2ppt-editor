@@ -117,6 +117,7 @@ export type SlideElement = {
   type: string
   id?: string
   groupId?: string
+  lock?: boolean
   left?: number
   top?: number
   width?: number
@@ -265,10 +266,35 @@ export type CustomSlide =
 
 export type PptxCustomContentInput = string | CustomSlide[]
 
+export type ThemeScopeKey = 'cover' | 'contents' | 'transition' | 'content' | 'end'
+
+export type ThemeScope = Record<ThemeScopeKey, boolean>
+
+export type ThemeBackgroundImageInput = {
+  src: string
+  scope: ThemeScope
+  width?: number
+  height?: number
+}
+
+export type ThemeLogoPosition = 'left' | 'right'
+
+export type ThemeLogoImageInput = {
+  src: string
+  scope: ThemeScope
+  position: ThemeLogoPosition
+  width?: number
+  height?: number
+}
+
 export type PptxCustomThemeInput = {
   themeColors: string[]
   fontColor: string
   backgroundColor?: string
+  backgroundImage?: ThemeBackgroundImageInput
+  logoImage?: ThemeLogoImageInput
+  clearBackgroundImage?: boolean
+  clearLogoImage?: boolean
 }
 
 export type PptxCustomOptions = {

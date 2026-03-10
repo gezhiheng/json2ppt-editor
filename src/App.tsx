@@ -3,6 +3,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { EditorPanel } from './components/EditorPanel'
 import { HeaderBar } from './components/HeaderBar'
 import { PreviewPanel } from './components/PreviewPanel'
+import type { ThemeMediaPayload } from './components/ThemeModal/types'
 import { createPPTX } from 'json2pptx'
 import { applyCustomContent, applyCustomTheme } from 'pptx-custom'
 import { parsePptxToJson } from './lib/pptx2json'
@@ -97,6 +98,23 @@ function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
   return changed ? { deck: { ...deck, slides }, changed } : { deck, changed }
 }
 
+function collectBlobUrlsFromDeck (deck: Deck | null): Set<string> {
+  const urls = new Set<string>()
+  if (!deck?.slides?.length) return urls
+
+  for (const slide of deck.slides) {
+    const backgroundSrc = slide.background?.src
+    if (backgroundSrc?.startsWith('blob:')) urls.add(backgroundSrc)
+
+    for (const element of slide.elements ?? []) {
+      const src = element.src
+      if (src?.startsWith('blob:')) urls.add(src)
+    }
+  }
+
+  return urls
+}
+
 export default function App (): JSX.Element {
   const [jsonText, setJsonText] = useState(initialJson)
   const [customContentText, setCustomContentText] = useState<string | null>(null)
@@ -113,6 +131,7 @@ export default function App (): JSX.Element {
   const [editorWidthPercent, setEditorWidthPercent] = useState(42)
   const [isResizing, setIsResizing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const blobUrlRef = useRef<Set<string>>(new Set())
 
   const parsed = useMemo(() => safeParse(deferredJsonText), [deferredJsonText])
   const deck = parsed.data
@@ -190,6 +209,26 @@ export default function App (): JSX.Element {
     if (!changed) return
     setJsonText(JSON.stringify(updated, null, 2))
   }, [deck, parsed.error])
+
+  useEffect(() => {
+    const nextUrls = collectBlobUrlsFromDeck(deck)
+
+    for (const url of blobUrlRef.current) {
+      if (!nextUrls.has(url)) {
+        URL.revokeObjectURL(url)
+      }
+    }
+
+    blobUrlRef.current = nextUrls
+  }, [deck])
+
+  useEffect(() => {
+    return () => {
+      for (const url of blobUrlRef.current) {
+        URL.revokeObjectURL(url)
+      }
+    }
+  }, [])
 
   // Handle Split Resizing
   useEffect(() => {
@@ -276,7 +315,8 @@ export default function App (): JSX.Element {
   function handleApplyTheme (
     themeColors: string[],
     fontColor: string,
-    backgroundColor: string
+    backgroundColor: string,
+    media: ThemeMediaPayload
   ): void {
     const current = safeParse(jsonText)
     if (!current.data) {
@@ -286,7 +326,8 @@ export default function App (): JSX.Element {
     const updated = applyCustomTheme(current.data, {
       themeColors,
       fontColor,
-      backgroundColor
+      backgroundColor,
+      ...media
     })
     setJsonText(JSON.stringify(updated, null, 2))
   }
@@ -326,6 +367,8 @@ export default function App (): JSX.Element {
           <div
             className='group relative z-10 flex w-6 flex-shrink-0 cursor-col-resize items-center justify-center hover:bg-black/5'
             onMouseDown={() => setIsResizing(true)}
+            title='Drag to resize editor and preview panels'
+            aria-label='Drag to resize editor and preview panels'
           >
             <div
               className={`h-8 w-1 rounded-full ${

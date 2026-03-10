@@ -195,6 +195,8 @@ export function PreviewPanel ({
                   'bg-white shadow-sm ring-1 ring-black/5 hover:bg-white'
               )}
               onClick={() => setIsGrid(false)}
+              title='Switch to list view'
+              aria-label='Switch to list view'
             >
               <List
                 className={cn(
@@ -212,6 +214,8 @@ export function PreviewPanel ({
                   'bg-white shadow-sm ring-1 ring-black/5 hover:bg-white'
               )}
               onClick={() => setIsGrid(true)}
+              title='Switch to grid view'
+              aria-label='Switch to grid view'
             >
               <LayoutGrid
                 className={cn(
@@ -235,6 +239,8 @@ export function PreviewPanel ({
               className={toolButtonClass}
               onClick={handleUploadClick}
               disabled={isExporting || isImporting}
+              title='Import PPTX (beta)'
+              aria-label='Import PPTX (beta)'
             >
               <Upload className='h-4 w-4' />
             </Button>
@@ -248,6 +254,8 @@ export function PreviewPanel ({
             className={toolButtonClass}
             onClick={onExportPptx}
             disabled={isExporting || isImporting}
+            title='Export PPTX'
+            aria-label='Export PPTX'
           >
             <Download className='h-4 w-4' />
           </Button>

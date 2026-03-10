@@ -10,6 +10,7 @@ import {
 import { Github, LayoutTemplate, Palette, RotateCcw } from 'lucide-react'
 import type { Deck } from '../types/ppt'
 import { ThemeModal } from './ThemeModal'
+import type { MediaScope, MediaScopeKey, ThemeMediaPayload } from './ThemeModal/types'
 import { cn } from '../lib/utils'
 
 type TemplateEntry = {
@@ -27,8 +28,27 @@ type HeaderBarProps = {
   onApplyTheme: (
     themeColors: string[],
     fontColor: string,
-    backgroundColor: string
+    backgroundColor: string,
+    media: ThemeMediaPayload
   ) => void
+}
+
+type MediaCandidate = {
+  src: string
+  count: number
+  scope: Set<MediaScopeKey>
+  leftVotes: number
+  rightVotes: number
+  width?: number
+  height?: number
+}
+
+const EMPTY_SCOPE: MediaScope = {
+  cover: false,
+  contents: false,
+  transition: false,
+  content: false,
+  end: false
 }
 
 export function HeaderBar ({
@@ -44,6 +64,7 @@ export function HeaderBar ({
   const [themeColors, setThemeColors] = useState<string[]>([])
   const [fontColor, setFontColor] = useState('#333333')
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF')
+  const [media, setMedia] = useState<ThemeMediaPayload>({})
 
   const isThemeDisabled = !deck || Boolean(jsonError)
   const commonTriggerClass =
@@ -55,6 +76,7 @@ export function HeaderBar ({
     setThemeColors(nextThemeColors)
     setFontColor(deck.theme?.fontColor ?? '#333333')
     setBackgroundColor(deck.theme?.backgroundColor ?? '#FFFFFF')
+    setMedia(extractThemeMedia(deck))
   }, [deck, isThemeOpen])
 
   function openThemeModal (): void {
@@ -63,15 +85,21 @@ export function HeaderBar ({
     setThemeColors(nextThemeColors)
     setFontColor(deck.theme?.fontColor ?? '#333333')
     setBackgroundColor(deck.theme?.backgroundColor ?? '#FFFFFF')
+    setMedia(extractThemeMedia(deck))
     setIsThemeOpen(true)
   }
 
   function applyTheme (
     nextThemeColors: string[],
     nextFontColor: string,
-    nextBackgroundColor: string
+    nextBackgroundColor: string,
+    nextMedia: ThemeMediaPayload
   ): void {
-    onApplyTheme(nextThemeColors, nextFontColor, nextBackgroundColor)
+    onApplyTheme(nextThemeColors, nextFontColor, nextBackgroundColor, nextMedia)
+    const syncedMedia: ThemeMediaPayload = {}
+    if (nextMedia.backgroundImage) syncedMedia.backgroundImage = nextMedia.backgroundImage
+    if (nextMedia.logoImage) syncedMedia.logoImage = nextMedia.logoImage
+    setMedia(syncedMedia)
     setIsThemeOpen(false)
   }
 
@@ -89,13 +117,18 @@ export function HeaderBar ({
             variant='secondary'
             className={cn('gap-2', commonTriggerClass)}
             disabled={isThemeDisabled}
+            title='Open theme settings'
             aria-label='Open theme settings'
           >
             <Palette className='h-4 w-4' />
             Theme
           </Button>
           <Select value={selectedTemplateId} onValueChange={onTemplateChange}>
-            <SelectTrigger className={cn('tracking-wider', commonTriggerClass)}>
+            <SelectTrigger
+              className={cn('tracking-wider', commonTriggerClass)}
+              title='Choose a template'
+              aria-label='Choose a template'
+            >
               <div className='flex items-center gap-2'>
                 <LayoutTemplate className='h-4 w-4' />
                 <SelectValue placeholder='Choose' />
@@ -118,6 +151,8 @@ export function HeaderBar ({
             variant='secondary'
             size='icon'
             className={commonTriggerClass}
+            title='Reset to original template'
+            aria-label='Reset to original template'
           >
             <RotateCcw className='h-4 w-4' />
           </Button>
@@ -125,6 +160,8 @@ export function HeaderBar ({
             href='https://github.com/gezhiheng/json2ppt-editor'
             target='_blank'
             rel='noopener noreferrer'
+            title='Open project repository on GitHub'
+            aria-label='Open project repository on GitHub'
             className={buttonVariants({
               variant: 'secondary',
               size: 'icon',
@@ -141,10 +178,135 @@ export function HeaderBar ({
         initialThemeColors={themeColors}
         initialFontColor={fontColor}
         initialBackgroundColor={backgroundColor}
+        initialMedia={media}
         jsonError={jsonError}
         onClose={() => setIsThemeOpen(false)}
         onApply={applyTheme}
       />
     </>
   )
+}
+
+function extractThemeMedia (deck: Deck): ThemeMediaPayload {
+  const backgroundCandidates = collectMediaCandidates(deck, 'background')
+  const logoCandidates = collectMediaCandidates(deck, 'logo')
+
+  const background = pickTopCandidate(backgroundCandidates)
+  const logo = pickTopCandidate(logoCandidates)
+
+  const result: ThemeMediaPayload = {}
+
+  if (background) {
+    result.backgroundImage = {
+      src: background.src,
+      scope: buildScopeRecord(background.scope),
+      width: background.width,
+      height: background.height
+    }
+  }
+
+  if (logo) {
+    result.logoImage = {
+      src: logo.src,
+      scope: buildScopeRecord(logo.scope),
+      position: logo.leftVotes >= logo.rightVotes ? 'left' : 'right',
+      width: logo.width,
+      height: logo.height
+    }
+  }
+
+  return result
+}
+
+function collectMediaCandidates (
+  deck: Deck,
+  imageType: 'background' | 'logo'
+): Map<string, MediaCandidate> {
+  const candidates = new Map<string, MediaCandidate>()
+  const slideWidth = deck.width ?? 1000
+
+  for (const slide of deck.slides ?? []) {
+    const scopeKey = mapSlideTypeToScopeKey(slide.type)
+    if (!scopeKey) continue
+
+    for (const element of slide.elements ?? []) {
+      if (element.type !== 'image' || element.imageType !== imageType || !element.src) {
+        continue
+      }
+
+      let candidate = candidates.get(element.src)
+      if (!candidate) {
+        candidate = {
+          src: element.src,
+          count: 0,
+          scope: new Set<MediaScopeKey>(),
+          leftVotes: 0,
+          rightVotes: 0,
+          width: element.width,
+          height: element.height
+        }
+        candidates.set(element.src, candidate)
+      }
+
+      candidate.count += 1
+      candidate.scope.add(scopeKey)
+
+      if (imageType === 'logo') {
+        if (inferLogoPosition(element.left, element.width, slideWidth) === 'left') {
+          candidate.leftVotes += 1
+        } else {
+          candidate.rightVotes += 1
+        }
+      }
+    }
+  }
+
+  return candidates
+}
+
+function pickTopCandidate (
+  candidates: Map<string, MediaCandidate>
+): MediaCandidate | undefined {
+  const values = [...candidates.values()]
+  if (!values.length) return undefined
+  values.sort((a, b) => b.count - a.count)
+  return values[0]
+}
+
+function buildScopeRecord (scopeSet: Set<MediaScopeKey>): MediaScope {
+  return {
+    ...EMPTY_SCOPE,
+    cover: scopeSet.has('cover'),
+    contents: scopeSet.has('contents'),
+    transition: scopeSet.has('transition'),
+    content: scopeSet.has('content'),
+    end: scopeSet.has('end')
+  }
+}
+
+function mapSlideTypeToScopeKey (type?: string): MediaScopeKey | null {
+  const normalized = type?.trim().toLowerCase()
+  if (!normalized) return null
+
+  if (normalized === 'cover') return 'cover'
+  if (normalized === 'contents' || normalized === 'agenda') return 'contents'
+  if (normalized === 'transition' || normalized === 'section') return 'transition'
+  if (normalized === 'content') return 'content'
+  if (normalized === 'end' || normalized === 'ending') return 'end'
+
+  return null
+}
+
+function inferLogoPosition (
+  left: number | undefined,
+  width: number | undefined,
+  slideWidth: number
+): 'left' | 'right' {
+  if (left === undefined) return 'right'
+  if (width === undefined) {
+    return left < slideWidth / 2 ? 'left' : 'right'
+  }
+
+  const centerX = left + width / 2
+  return centerX < slideWidth / 2 ? 'left' : 'right'
 }

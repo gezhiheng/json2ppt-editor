@@ -1,6 +1,6 @@
 {
   "name": "pptx-custom",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Custom content and theme utilities for PPTX JSON templates.",
   "license": "MIT",
   "main": "dist/index.cjs",
