@@ -27,6 +27,8 @@ export function EditorPanel ({
 }: EditorPanelProps): JSX.Element {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const customContentInputRef = useRef<HTMLInputElement>(null)
+  const toolButtonClass =
+    'h-8 px-2 text-ink-600 hover:bg-ink-200 hover:text-ink-900'
 
   function handleFormat () {
     try {
@@ -100,7 +102,7 @@ export function EditorPanel ({
   }
 
   return (
-    <section className='h-full flex min-h-0 flex-col rounded-xl border border-ink-200/60 bg-[#1f1b16] p-5 shadow-sharp'>
+    <section className='h-full flex min-h-0 flex-col rounded-xl border border-white/70 bg-white/80 p-5 shadow-soft backdrop-blur'>
       <input
         type='file'
         ref={fileInputRef}
@@ -116,12 +118,12 @@ export function EditorPanel ({
         onChange={handleCustomContentFileChange}
       />
       <div className='flex items-center justify-between'>
-        <h2 className='font-display text-lg text-white'>JSON Editor</h2>
+        <h2 className='font-display text-lg text-ink-900'>JSON Editor</h2>
         <div className='flex items-center gap-2'>
           <Button
             variant='secondary'
             size='sm'
-            className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+            className={toolButtonClass}
             onClick={handleExtractTheme}
             title='Extract theme colors'
           >
@@ -131,7 +133,7 @@ export function EditorPanel ({
           <Button
             variant='secondary'
             size='sm'
-            className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+            className={toolButtonClass}
             onClick={handleFormat}
             title='Format JSON'
           >
@@ -141,7 +143,7 @@ export function EditorPanel ({
           <Button
             variant='secondary'
             size='sm'
-            className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+            className={toolButtonClass}
             onClick={handleImportCustomContentClick}
             title='Upload custom content'
           >
@@ -151,7 +153,7 @@ export function EditorPanel ({
           <Button
             variant='secondary'
             size='sm'
-            className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+            className={toolButtonClass}
             onClick={handleImportClick}
             title='Upload JSON'
           >
@@ -162,7 +164,7 @@ export function EditorPanel ({
             <Button
               variant='secondary'
               size='sm'
-              className='h-8 px-2 text-ink-200 hover:bg-white/10 hover:text-white'
+              className={toolButtonClass}
               onClick={onDownload}
               title='Download JSON'
             >
@@ -172,11 +174,11 @@ export function EditorPanel ({
           )}
         </div>
       </div>
-      <div className='mt-4 h-full border border-white/10'>
+      <div className='mt-4 h-full overflow-hidden rounded-lg border border-ink-200 bg-white'>
         <Editor
           height='100%'
           defaultLanguage='json'
-          theme='vs-dark'
+          theme='vs'
           value={value}
           onChange={next => onChange(next ?? '')}
           options={editorOptions}
