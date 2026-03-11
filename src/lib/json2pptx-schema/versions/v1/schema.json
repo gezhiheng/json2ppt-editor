@@ -127,6 +127,70 @@
       },
       "additionalProperties": true
     },
+    "solidFill": {
+      "type": "object",
+      "required": [
+        "type",
+        "color"
+      ],
+      "properties": {
+        "type": {
+          "const": "solid"
+        },
+        "color": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "gradientFill": {
+      "type": "object",
+      "required": [
+        "type",
+        "gradient"
+      ],
+      "properties": {
+        "type": {
+          "const": "gradient"
+        },
+        "gradient": {
+          "$ref": "#/definitions/gradient"
+        }
+      },
+      "additionalProperties": true
+    },
+    "imageFill": {
+      "type": "object",
+      "required": [
+        "type",
+        "src"
+      ],
+      "properties": {
+        "type": {
+          "const": "image"
+        },
+        "src": {
+          "type": "string"
+        },
+        "opacity": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "fill": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/solidFill"
+        },
+        {
+          "$ref": "#/definitions/gradientFill"
+        },
+        {
+          "$ref": "#/definitions/imageFill"
+        }
+      ]
+    },
     "theme": {
       "type": "object",
       "properties": {
@@ -396,7 +460,7 @@
                 "type": "string"
               },
               "fill": {
-                "type": "string"
+                "$ref": "#/definitions/fill"
               },
               "lineHeight": {
                 "type": "number"
@@ -445,7 +509,7 @@
                 "$ref": "#/definitions/pair"
               },
               "fill": {
-                "type": "string"
+                "$ref": "#/definitions/fill"
               },
               "fixedRatio": {
                 "type": "boolean"
@@ -458,9 +522,6 @@
               },
               "pathFormula": {
                 "type": "string"
-              },
-              "gradient": {
-                "$ref": "#/definitions/gradient"
               },
               "special": {
                 "type": "boolean"
@@ -605,22 +666,7 @@
       "additionalProperties": true
     },
     "slideBackground": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string"
-        },
-        "color": {
-          "type": "string"
-        },
-        "src": {
-          "type": "string"
-        },
-        "gradient": {
-          "$ref": "#/definitions/gradient"
-        }
-      },
-      "additionalProperties": true
+      "$ref": "#/definitions/fill"
     },
     "slide": {
       "type": "object",

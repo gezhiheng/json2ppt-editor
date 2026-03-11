@@ -4,6 +4,7 @@ import { renderElement } from './renderers'
 import type { PPTXPreviewerProps, Slide } from './types'
 import { getElementSize } from './utils/elementSize'
 import { getFlipTransform, getShadowFilter } from './utils/elementStyle'
+import { getCssBackground } from './utils/fill'
 
 const PREVIEW_WIDTH = 1000
 const PREVIEW_HEIGHT = 562.5
@@ -25,6 +26,7 @@ export function preparePreviewSlide (slide: Slide): Slide {
 
 export function PPTXPreviewer ({ slide, className }: PPTXPreviewerProps) {
   const preparedSlide = useMemo(() => preparePreviewSlide(slide), [slide])
+  const background = getCssBackground(preparedSlide.background)
 
   return (
     <div
@@ -38,12 +40,12 @@ export function PPTXPreviewer ({ slide, className }: PPTXPreviewerProps) {
         lineHeight: 'normal'
       }}
     >
-      {preparedSlide.background?.color ? (
+      {background ? (
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: preparedSlide.background.color
+            background
           }}
         />
       ) : null}

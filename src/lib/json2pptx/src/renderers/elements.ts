@@ -1,13 +1,14 @@
 import type PptxGenJS from "pptxgenjs";
 
-import type { Deck, SlideElement } from "../types/ppt";
+import type { Presentation, SlideElement } from "../types/ppt";
 import { resolveImageData } from "../resolveImageData";
 import { toPoints } from "../svgPathParser";
 import { getElementRange, getLineElementPath } from "../element";
 import { DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE } from "./constants";
+import { fillRequiresXmlPatch } from "./fill-patch";
 import { formatPoints } from "./points";
 import { getLineArrowType, isBase64Image } from "./utils";
-import { type PatternShape } from "./types";
+import { type FillPatch } from "./types";
 import {
   buildTableRows,
   formatColor,
@@ -22,16 +23,21 @@ import {
 export function addTextElement(
   slide: PptxGenJS.Slide,
   element: SlideElement,
-  template: Deck,
+  template: Presentation,
+  slideIndex: number,
+  elementIndex: number,
   ratioPx2Pt: number,
   ratioPx2Inch: number,
-  textPadding: number
+  textPadding: number,
+  fillPatches: FillPatch[]
 ): void {
   if (element.type !== "text" || !element.content) return;
   const textProps = formatHTML(element.content, ratioPx2Pt);
   const opacity = getElementOpacity(element.opacity);
+  const objectName = `text-${slideIndex}-${element.id ?? elementIndex}`;
+  const fill = element.fill;
 
-  const options: PptxGenJS.TextPropsOptions = {
+  const options: PptxGenJS.TextPropsOptions & { objectName?: string } = {
     x: (element.left ?? 0) / ratioPx2Inch,
     y: (element.top ?? 0) / ratioPx2Inch,
     w: (element.width ?? 0) / ratioPx2Inch,
@@ -45,19 +51,28 @@ export function addTextElement(
     margin: [textPadding, textPadding, 0, textPadding * 0.42],
     paraSpaceBefore: 0,
     lineSpacingMultiple: 1.5,
-    fit: "none"
+    fit: "none",
+    objectName
   };
   if (element.rotate) options.rotate = element.rotate;
   if (element.wordSpace) options.charSpacing = element.wordSpace / ratioPx2Pt;
   if (element.lineHeight) options.lineSpacingMultiple = element.lineHeight;
-  if (element.fill) {
-    const c = formatColor(element.fill);
+  if (fill?.type === "solid" && fill.color) {
+    const c = formatColor(fill.color);
     options.fill = {
       color: c.color,
       transparency: (1 - c.alpha * opacity) * 100
     };
   } else {
     options.fill = { color: "FFFFFF", transparency: 100 };
+  }
+  if (fill && fillRequiresXmlPatch(fill)) {
+    fillPatches.push({
+      kind: "shape",
+      slideIndex,
+      objectName,
+      fill
+    });
   }
   if (element.defaultColor) options.color = formatColor(element.defaultColor).color;
   if (element.shadow) options.shadow = getShadowOption(element.shadow, ratioPx2Pt);
@@ -133,7 +148,7 @@ export function addShapeElement(
   ratioPx2Inch: number,
   slideIndex: number,
   elementIndex: number,
-  patternShapes: PatternShape[]
+  fillPatches: FillPatch[]
 ): void {
   if (element.type !== "shape" || !element.path || !element.viewBox) return;
   const scale = {
@@ -143,31 +158,35 @@ export function addShapeElement(
   const rawPoints = toPoints(element.path);
   if (!rawPoints.length) return;
   const points = formatPoints(rawPoints, ratioPx2Inch, scale);
-  const pattern = (element as any).pattern as string | undefined;
-  const hasFill = typeof element.fill === "string" ? element.fill.trim().length > 0 : false;
+  const fill = element.fill;
   const opacity = getElementOpacity(element.opacity);
+  const objectName = `shape-${slideIndex}-${element.id ?? elementIndex}`;
 
   const options: PptxGenJS.ShapeProps = {
     x: (element.left ?? 0) / ratioPx2Inch,
     y: (element.top ?? 0) / ratioPx2Inch,
     w: (element.width ?? 0) / ratioPx2Inch,
     h: (element.height ?? 0) / ratioPx2Inch,
-    points
+    points,
+    objectName
   };
 
-  if (pattern) {
-    const objectName = `pattern-${slideIndex}-${element.id ?? elementIndex}`;
-    options.objectName = objectName;
-    options.fill = { color: "FFFFFF", transparency: 100 };
-    patternShapes.push({ slideIndex, objectName, dataUrl: pattern });
-  } else if (hasFill) {
-    const fillColor = formatColor(element.fill || "#000000");
+  if (fill?.type === "solid" && fill.color) {
+    const fillColor = formatColor(fill.color);
     options.fill = {
       color: fillColor.color,
       transparency: (1 - fillColor.alpha * opacity) * 100
     };
   } else {
     options.fill = { color: "FFFFFF", transparency: 100 };
+  }
+  if (fill && fillRequiresXmlPatch(fill)) {
+    fillPatches.push({
+      kind: "shape",
+      slideIndex,
+      objectName,
+      fill
+    });
   }
 
   if (element.flipH) options.flipH = element.flipH;
@@ -182,7 +201,7 @@ export function addShapeElement(
 
   if (!element.text?.content) return;
   const textProps = formatHTML(element.text.content, ratioPx2Pt);
-  const textOptions: PptxGenJS.TextPropsOptions = {
+  const textOptions: PptxGenJS.TextPropsOptions & { objectName?: string } = {
     x: (element.left ?? 0) / ratioPx2Inch,
     y: (element.top ?? 0) / ratioPx2Inch,
     w: (element.width ?? 0) / ratioPx2Inch,
@@ -191,9 +210,13 @@ export function addShapeElement(
     fontFace: element.text.defaultFontName || DEFAULT_FONT_FACE,
     color: "#000000",
     paraSpaceBefore: 0,
-    valign: element.text.align as PptxGenJS.VAlign,
+    valign:
+      element.text.align === "middle"
+        ? "mid"
+        : (element.text.align as PptxGenJS.VAlign),
     fill: { color: "FFFFFF", transparency: 100 },
-    fit: "none"
+    fit: "none",
+    objectName: `shape-text-${slideIndex}-${element.id ?? elementIndex}`
   };
   textOptions.margin = 0;
   if (element.rotate) textOptions.rotate = element.rotate;

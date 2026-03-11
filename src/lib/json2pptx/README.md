@@ -13,13 +13,13 @@ npm i json2pptx
 ```ts
 import { createPPTX } from 'json2pptx'
 
-const slide = {
+const deck = {
   title: 'Demo',
   width: 1000,
   height: 562.5,
   slides: [
     {
-      background: { color: '#ffffff' },
+      background: { type: 'solid', color: '#ffffff' },
       elements: [
         {
           type: 'text',
@@ -34,7 +34,7 @@ const slide = {
   ]
 }
 
-const { blob, fileName } = await createPPTX(slide)
+const { blob, fileName } = await createPPTX(deck)
 // 在浏览器中下载：
 // const url = URL.createObjectURL(blob)
 // const a = document.createElement('a')
@@ -45,9 +45,10 @@ const { blob, fileName } = await createPPTX(slide)
 
 ## API
 
-### `createPPTX(template: Deck): Promise<{ blob: Blob; fileName: string }>`
+### `createPPTX(template: Presentation): Promise<{ blob: Blob; fileName: string }>`
 
-根据 `Deck` 数据生成 PPTX 的 `Blob` 与建议文件名。
+根据 `Presentation` 数据生成 PPTX 的 `Blob` 与建议文件名。输入会先经过
+`json2pptx-schema` 的迁移、校验和规范化流程。
 
 ### `resolveImageData(src: string): Promise<string>`
 
@@ -59,7 +60,15 @@ const { blob, fileName } = await createPPTX(slide)
 ## 类型
 
 包内导出了常用类型：
-`Deck`、`Slide`、`SlideElement`、`TextElement`、`ImageElement`、`ShapeElement`、`LineElement` 等。
+`Presentation`、`PresentationData`、`PresentationTheme`、`Slide`、`SlideElement`、
+`TextElement`、`ImageElement`、`ShapeElement`、`LineElement` 等。
+
+## 说明
+
+- `background` / `fill` 使用显式联合类型：`solid | gradient | image`。
+- 导出的 `.pptx` 只使用 Office 原生 XML 表达视觉信息，不会嵌入自定义 JSON 文件。
+- 与 `ppt2json` 的视觉 round-trip 优先围绕共享视觉 primitive 和仓库内模板优化。
+- `Deck` / `DeckTheme` 仍保留为兼容别名，但新的推荐命名是 `Presentation` / `PresentationTheme`。
 
 ## 开发
 

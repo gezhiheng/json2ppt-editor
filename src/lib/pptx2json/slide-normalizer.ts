@@ -1,6 +1,6 @@
 import type { Slide } from './types'
 import { flattenElements, normalizeElement } from './element-mapper'
-import { mapFill } from './utils'
+import { mapFill, parseExportedObjectName } from './utils'
 
 const ID_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_";
 
@@ -17,7 +17,9 @@ export function normalizeSlide(slide: any, index: number): Slide {
     return orderA - orderB;
   });
 
-  const elements = flattenElements(orderedElements).map((element, elementIndex) => {
+  const restoredElements = restoreExportedRoundTripElements(orderedElements);
+
+  const elements = flattenElements(restoredElements).map((element, elementIndex) => {
     if (!element.id) {
       element.id = makeId(`slide-${index}-element-${elementIndex}-${element.type}`);
     }
@@ -26,11 +28,7 @@ export function normalizeSlide(slide: any, index: number): Slide {
 
   return {
     id: slide?.id ?? slide?.slideId ?? makeId(`slide-${index}`),
-    background: backgroundFill.fill
-      ? { type: "solid", color: backgroundFill.fill }
-      : backgroundFill.pattern
-        ? { type: "image", src: backgroundFill.pattern }
-        : undefined,
+    background: backgroundFill,
     elements,
     remark: slide?.remark ?? ""
   };
@@ -47,6 +45,50 @@ function makeId(seed: string): string {
     id += ID_ALPHABET[Math.floor(value * ID_ALPHABET.length)];
   }
   return id;
+}
+
+function restoreExportedRoundTripElements(elements: any[]): any[] {
+  const restored = elements.map((element) => {
+    if (element?.type === 'group' && Array.isArray(element.elements)) {
+      return {
+        ...element,
+        elements: restoreExportedRoundTripElements(element.elements)
+      }
+    }
+    return element
+  })
+
+  const shapesByRefId = new Map<string, any>()
+  for (const element of restored) {
+    const meta = parseExportedObjectName(element?.name)
+    if (meta?.kind === 'shape') {
+      shapesByRefId.set(meta.refId, element)
+    }
+  }
+
+  return restored.filter((element) => {
+    const meta = parseExportedObjectName(element?.name)
+    if (meta?.kind !== 'shape-text') {
+      return true
+    }
+
+    const targetShape = shapesByRefId.get(meta.refId)
+    if (!targetShape || targetShape.type !== 'shape') {
+      return true
+    }
+
+    mergeShapeText(targetShape, element)
+    return false
+  })
+}
+
+function mergeShapeText(targetShape: any, textShape: any) {
+  if (!targetShape.content && textShape?.content) {
+    targetShape.content = textShape.content
+  }
+  if (textShape?.vAlign) {
+    targetShape.vAlign = textShape.vAlign
+  }
 }
 
 function hashSeed(value: string): () => number {

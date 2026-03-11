@@ -73,6 +73,32 @@ export type TemplateJsonOutline = {
   style: string
 }
 
+export type FillGradientStop = {
+  pos: number
+  color: string
+}
+
+export type FillGradient = {
+  type: string
+  rotate: number
+  colors: FillGradientStop[]
+}
+
+export type ElementFill =
+  | {
+      type: 'solid'
+      color: string
+    }
+  | {
+      type: 'gradient'
+      gradient: FillGradient
+    }
+  | {
+      type: 'image'
+      src: string
+      opacity?: number
+    }
+
 export type TemplateJsonElementBase = {
   type: string
   id: string
@@ -91,7 +117,7 @@ export type TemplateJsonShape = TemplateJsonElementBase & {
   type: 'shape'
   viewBox: [number, number]
   path: string
-  fill: string
+  fill: ElementFill
   fixedRatio?: boolean
   shadow?: TemplateJsonShadow
   outline?: TemplateJsonOutline
@@ -144,10 +170,7 @@ export type TemplateJsonElement =
 export type TemplateJsonSlide = {
   id: string
   elements: TemplateJsonElement[]
-  background?: {
-    type: string
-    color: string
-  }
+  background?: ElementFill
   type?: string
 }
 

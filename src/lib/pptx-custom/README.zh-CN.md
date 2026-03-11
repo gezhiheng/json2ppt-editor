@@ -21,7 +21,7 @@ npm i pptx-custom
 - `applyCustomTheme(deck, themeInput)`
 
 同时导出类型，包括：
-`CustomSlide`、`Deck`、`PptxCustomContentInput`、`PptxCustomThemeInput`、
+`CustomSlide`、`Presentation`、`PresentationData`、`PresentationTheme`、`PptxCustomContentInput`、`PptxCustomThemeInput`、
 `PptxCustomOptions`、`TemplateJson`、`TemplateJsonSlide`、`TemplateJsonElement`、
 `TemplateJsonTheme`。
 
@@ -129,3 +129,4 @@ NDJSON 示例：
 - 当同时提供 `backgroundImage` 与 `backgroundColor` 时，会在目标页应用
   50% 透明度的背景色叠加效果。
 - 当前行为下，`clearBackgroundImage` 也会同时清除 logo 图片。
+- `Deck` 仍保留为兼容别名，但新的推荐根类型命名是 `Presentation`。

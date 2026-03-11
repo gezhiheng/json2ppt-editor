@@ -1,9 +1,11 @@
-import type { Deck, PptxCustomThemeInput } from '../types'
+import type { Presentation, PptxCustomThemeInput } from '../types'
 import { colorsEqual, isWhiteColor } from './color-utils'
 import { buildColorMappings, buildSingleMapping } from './mappings'
 import { replaceSlideColors } from './replacers'
 
-export function applyTheme2Json (deck: Deck, update: PptxCustomThemeInput): Deck {
+type SolidBackground = Extract<NonNullable<Presentation['slides']>[number]['background'], { type: 'solid' }>
+
+export function applyTheme2Json (deck: Presentation, update: PptxCustomThemeInput): Presentation {
   const previousTheme = deck.theme ?? {}
   const themeColors = update.themeColors.slice(0, 6)
   const themeMappings = buildColorMappings(
@@ -26,7 +28,8 @@ export function applyTheme2Json (deck: Deck, update: PptxCustomThemeInput): Deck
       update.fontColor
     )
     if (!nextBackground) return nextSlide
-    const currentColor = nextSlide.background?.color
+    const currentColor =
+      nextSlide.background?.type === 'solid' ? nextSlide.background.color : undefined
     const shouldUpdate =
       !currentColor ||
       (prevBackground && colorsEqual(currentColor, prevBackground)) ||
@@ -34,11 +37,7 @@ export function applyTheme2Json (deck: Deck, update: PptxCustomThemeInput): Deck
     if (!shouldUpdate) return nextSlide
     return {
       ...nextSlide,
-      background: {
-        ...(nextSlide.background ?? {}),
-        type: nextSlide.background?.type ?? 'solid',
-        color: nextBackground
-      }
+      background: createSolidBackground(nextBackground)
     }
   })
 
@@ -51,5 +50,12 @@ export function applyTheme2Json (deck: Deck, update: PptxCustomThemeInput): Deck
       backgroundColor: update.backgroundColor ?? previousTheme.backgroundColor
     },
     slides
+  }
+}
+
+function createSolidBackground (color: string): SolidBackground {
+  return {
+    type: 'solid',
+    color
   }
 }

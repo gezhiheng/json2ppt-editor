@@ -24,10 +24,14 @@ export {
 export { V1_SCHEMA_VERSION } from './versions/v1/types'
 
 export type {
+  PresentationDocument,
+  PresentationDocumentInput,
   V1Document,
   V1DocumentInput,
   V1Element,
   V1ElementInput,
+  V1Fill,
+  V1FillInput,
   V1Gradient,
   V1ImageElement,
   V1LineElement,

@@ -14,16 +14,16 @@ import {
   templateList,
   type TemplateEntry
 } from './lib/templates'
-import type { Deck } from './types/ppt'
+import type { PresentationData } from './types/ppt'
 
 const MIN_PREVIEW_WIDTH = 320
 const PREVIEW_GUTTER = 48
 const MOBILE_PREVIEW_GUTTER = 24
 const MOBILE_LAYOUT_QUERY = '(max-width: 1023px)'
 
-function safeParse (value: string): { data: Deck | null; error: string } {
+function safeParse (value: string): { data: PresentationData | null; error: string } {
   try {
-    return { data: JSON.parse(value) as Deck, error: '' }
+    return { data: JSON.parse(value) as PresentationData, error: '' }
   } catch (error) {
     return { data: null, error: (error as Error).message }
   }
@@ -72,16 +72,16 @@ function generateSlideId (existing: Set<string>): string {
   return generateSlideId(existing)
 }
 
-function reorderSlideIdFirst (slide: Deck['slides'][number], id: string) {
+function reorderSlideIdFirst (slide: PresentationData['slides'][number], id: string) {
   const ordered: Record<string, unknown> = { id }
   for (const key of Object.keys(slide)) {
     if (key === 'id') continue
     ordered[key] = (slide as Record<string, unknown>)[key]
   }
-  return ordered as Deck['slides'][number]
+  return ordered as PresentationData['slides'][number]
 }
 
-function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
+function ensureSlideIds (deck: PresentationData): { deck: PresentationData; changed: boolean } {
   if (!deck.slides?.length) return { deck, changed: false }
   let changed = false
   const used = new Set<string>()
@@ -100,7 +100,7 @@ function ensureSlideIds (deck: Deck): { deck: Deck; changed: boolean } {
   return changed ? { deck: { ...deck, slides }, changed } : { deck, changed }
 }
 
-function collectBlobUrlsFromDeck (deck: Deck | null): Set<string> {
+function collectBlobUrlsFromDeck (deck: PresentationData | null): Set<string> {
   const urls = new Set<string>()
   if (!deck?.slides?.length) return urls
 

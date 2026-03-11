@@ -12,6 +12,9 @@ export {
 export type {
   CustomSlide,
   Deck,
+  Presentation,
+  PresentationData,
+  PresentationTheme,
   PptxCustomContentInput,
   PptxCustomOptions,
   PptxCustomThemeInput,

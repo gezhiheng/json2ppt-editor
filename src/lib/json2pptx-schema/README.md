@@ -8,6 +8,8 @@ Schema and parsing pipeline for json2pptx documents.
 - `validateDocument(input)` (Ajv)
 - `normalizeDocument(input)`
 - `parseDocument(input)` -> `migrate -> validate -> normalize`
+- explicit visual fill/background unions: `solid | gradient | image`
+- legacy input compatibility through migration before validation
 
 ## Install
 
@@ -18,10 +20,22 @@ npm i json2pptx-schema
 ## Usage
 
 ```ts
-import { parseDocument } from 'json2pptx-schema'
+import { parseDocument, type PresentationDocument } from 'json2pptx-schema'
 
-const doc = parseDocument(input)
+const doc: PresentationDocument = parseDocument({
+  title: 'Demo',
+  width: 960,
+  height: 540,
+  slides: [
+    {
+      background: { type: 'solid', color: '#ffffff' },
+      elements: []
+    }
+  ]
+})
 ```
+
+`parseDocument` returns a normalized `PresentationDocument`, including normalized fill/background unions.
 
 ## Publish
 

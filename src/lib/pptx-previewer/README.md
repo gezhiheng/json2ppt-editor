@@ -1,14 +1,16 @@
 # pptx-previewer
 
-`pptx-previewer` is a React component for rendering PPTX-like slide JSON in the browser.
+`pptx-previewer` is a React component for rendering `json2pptx-schema`-style slide JSON in the browser.
 
-It is designed to work with JSON produced by PPTX parsers (for example the `pptx2json` output used in this repository) and supports common slide elements:
+It is designed to work with normalized deck JSON, including output from `ppt2json`, and supports common slide elements:
 
 - `shape`
 - `line`
 - `text`
 - `image`
 - `table`
+- solid / gradient / image backgrounds and fills
+- image clipping via `clip.range`
 
 ## Installation
 
@@ -22,7 +24,7 @@ pnpm add pptx-previewer
 import { PPTXPreviewer, type Slide } from 'pptx-previewer';
 
 const slide: Slide = {
-  background: { color: '#ffffff' },
+  background: { type: 'solid', color: '#ffffff' },
   elements: [
     {
       type: 'text',
@@ -84,4 +86,5 @@ Build output is generated in `dist/`:
 
 - This package is `react` peer-dependent (`>=18`).
 - Element coordinates, sizes, and style semantics follow the input JSON schema.
+- Backgrounds and fills follow the explicit `solid | gradient | image` union used by `json2pptx-schema`.
 - Text content is rendered via `dangerouslySetInnerHTML`; sanitize external/untrusted HTML before rendering.

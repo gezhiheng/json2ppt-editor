@@ -2,12 +2,12 @@ import { useRef, useState, type RefObject } from 'react'
 import { Check, Copy, Download, LayoutGrid, List, Upload } from 'lucide-react'
 import { PPTXPreviewer } from 'pptx-previewer'
 
-import type { Deck, Slide } from '../types/ppt'
+import type { PresentationData, Slide } from '../types/ppt'
 import { Button } from './ui/button'
 import { cn } from '../lib/utils'
 
 type PreviewPanelProps = {
-  deck: Deck | null
+  deck: PresentationData | null
   slideWidth: number
   slideHeight: number
   previewWidth: number
@@ -88,13 +88,12 @@ function SlideCard ({
     }
   }
 
-  const backgroundColor = slide.background?.color ?? themeBackground
-  const previewSlide: Slide = backgroundColor
+  const previewSlide: Slide = !slide.background && themeBackground
     ? {
         ...slide,
         background: {
-          ...slide.background,
-          color: backgroundColor
+          type: 'solid',
+          color: themeBackground
         }
       }
     : slide

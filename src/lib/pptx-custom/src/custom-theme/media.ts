@@ -1,5 +1,5 @@
 import type {
-  Deck,
+  Presentation,
   PptxCustomThemeInput,
   Slide,
   SlideElement,
@@ -135,9 +135,9 @@ function buildLogoElement (input: LogoElementInput): SlideElement {
 }
 
 export function replaceScopedMedia (
-  deck: Deck,
+  deck: Presentation,
   input: PptxCustomThemeInput
-): Deck {
+): Presentation {
   if (!deck.slides?.length) return deck
 
   const slideWidth = deck.width ?? FALLBACK_SLIDE_WIDTH

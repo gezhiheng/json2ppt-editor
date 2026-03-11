@@ -1,4 +1,5 @@
 import type { SlideElement } from '../types';
+import { getSvgLinearGradientCoordinates } from '../utils/fill';
 
 const getOutlineDashArray = (outline?: SlideElement['outline']) => {
   const style = outline?.style;
@@ -12,7 +13,16 @@ export function renderShape(element: SlideElement, patternId: string) {
   const viewWidth = element.viewBox?.[0] ?? element.width ?? 0;
   const viewHeight = element.viewBox?.[1] ?? element.height ?? 0;
   const outlineDashArray = getOutlineDashArray(element.outline);
-  const fill = element.pattern ? `url(#${patternId})` : element.fill || 'transparent';
+  const gradientId = `${patternId}-gradient`;
+  let fill = 'transparent';
+
+  if (element.fill?.type === 'solid') {
+    fill = element.fill.color || 'transparent';
+  } else if (element.fill?.type === 'image' && element.fill.src) {
+    fill = `url(#${patternId})`;
+  } else if (element.fill?.type === 'gradient' && element.fill.gradient?.colors?.length) {
+    fill = `url(#${gradientId})`;
+  }
 
   const text = element.text;
   const verticalAlign = text?.align ?? 'middle';
@@ -21,7 +31,7 @@ export function renderShape(element: SlideElement, patternId: string) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <svg style={{ position: 'absolute', inset: 0 }} overflow='visible' width={element.width} height={element.height}>
-        {element.pattern && (
+        {element.fill?.type === 'image' && element.fill.src && (
           <defs>
             <pattern
               id={patternId}
@@ -30,10 +40,38 @@ export function renderShape(element: SlideElement, patternId: string) {
               width={viewWidth}
               height={viewHeight}
             >
-              <image href={element.pattern} width={viewWidth} height={viewHeight} preserveAspectRatio='xMidYMid slice' />
+              <image
+                href={element.fill.src}
+                width={viewWidth}
+                height={viewHeight}
+                preserveAspectRatio='xMidYMid slice'
+                opacity={element.fill.opacity ?? 1}
+              />
             </pattern>
           </defs>
         )}
+        {element.fill?.type === 'gradient' && element.fill.gradient?.colors?.length ? (
+          <defs>
+            {(() => {
+              const { x1, y1, x2, y2 } = getSvgLinearGradientCoordinates(
+                element.fill?.gradient?.rotate ?? 0
+              );
+              return element.fill.gradient?.type === 'linear' || element.fill.gradient?.type === 'line' ? (
+                <linearGradient id={gradientId} x1={x1} y1={y1} x2={x2} y2={y2}>
+                  {element.fill.gradient.colors.map((stop, index) => (
+                    <stop key={index} offset={`${stop.pos ?? 0}%`} stopColor={stop.color ?? '#FFFFFF'} />
+                  ))}
+                </linearGradient>
+              ) : (
+                <radialGradient id={gradientId} cx='50%' cy='50%' r='50%'>
+                  {element.fill.gradient.colors.map((stop, index) => (
+                    <stop key={index} offset={`${stop.pos ?? 0}%`} stopColor={stop.color ?? '#FFFFFF'} />
+                  ))}
+                </radialGradient>
+              );
+            })()}
+          </defs>
+        ) : null}
         <g transform={`scale(${(element.width ?? 0) / viewWidth || 1}, ${(element.height ?? 0) / viewHeight || 1}) translate(0,0) matrix(1,0,0,1,0,0)`}>
           <path
             vectorEffect='non-scaling-stroke'

@@ -15,7 +15,7 @@ JSON2PPT Editor 是一个本地优先的 JSON 幻灯片编辑应用。
 - 基于 Monaco Editor 的实时 JSON 编辑与代码折叠
 - 实时幻灯片预览
 - 通过 PptxGenJS 导出 PPTX
-- 支持将 PPTX 导入回可编辑 JSON（可回传 JSON 元数据）
+- 支持将 PPTX 导入回可编辑 JSON（基于 PPT 原生 XML 的视觉映射）
 - 导出当前 JSON 为文件
 - 基于 `/template/*.json` 的模板选择器
 
@@ -99,7 +99,10 @@ pnpm build:pptx-custom
 
 - **导出 JSON**：下载当前编辑器内容。
 - **导出 PPTX**：通过 PptxGenJS 生成 `.pptx` 文件。
-- **导入 PPTX**：上传 `.pptx` 并转换为 JSON。若该 PPTX 由本应用生成，则优先使用内嵌 JSON 以尽量保持一致性。
+- **导入 PPTX**：上传 `.pptx` 并通过 Office XML 解析转换为 JSON。
+  视觉 round-trip 优先针对仓库内模板和共享视觉 primitive 进行优化，
+  包括纯色/渐变/图片填充、图片裁剪、文本、路径和线条。
+  `.pptx` 内不会嵌入，也不会读取任何自定义 JSON 文件。
 
 ## 说明
 

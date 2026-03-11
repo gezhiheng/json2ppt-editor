@@ -1,11 +1,13 @@
 import { type CSSProperties } from 'react';
 import type { SlideElement } from '../types';
+import { getCssBackground } from '../utils/fill';
 
 export function renderText(element: SlideElement) {
   const paragraphStyle =
     element.paragraphSpace !== undefined
       ? ({ ['--paragraphSpace' as string]: `${element.paragraphSpace}px` } as CSSProperties)
       : undefined;
+  const background = getCssBackground(element.fill);
 
   return (
     <div
@@ -19,6 +21,7 @@ export function renderText(element: SlideElement) {
         fontFamily: element.defaultFontName || 'sans-serif',
         color: element.defaultColor,
         writingMode: element.vertical ? 'vertical-rl' : undefined,
+        background,
         ...paragraphStyle
       }}
       dangerouslySetInnerHTML={{ __html: element.content || '' }}

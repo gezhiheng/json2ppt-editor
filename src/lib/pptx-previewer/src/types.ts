@@ -1,3 +1,29 @@
+export type FillGradientStop = {
+  pos?: number;
+  color?: string;
+};
+
+export type FillGradient = {
+  type?: string;
+  rotate?: number;
+  colors?: FillGradientStop[];
+};
+
+export type ElementFill =
+  | {
+      type: 'solid';
+      color?: string;
+    }
+  | {
+      type: 'gradient';
+      gradient?: FillGradient;
+    }
+  | {
+      type: 'image';
+      src?: string;
+      opacity?: number;
+    };
+
 export type SlideElement = {
   type: string;
   id?: string;
@@ -7,8 +33,7 @@ export type SlideElement = {
   width?: number;
   height?: number;
   rotate?: number;
-  fill?: string;
-  pattern?: string;
+  fill?: ElementFill;
   path?: string;
   viewBox?: [number, number];
   pathFormula?: string;
@@ -87,11 +112,7 @@ export type Slide = {
   id?: string;
   elements?: SlideElement[];
   remark?: string;
-  background?: {
-    type?: string;
-    color?: string;
-    src?: string;
-  };
+  background?: ElementFill;
   type?: string;
 };
 

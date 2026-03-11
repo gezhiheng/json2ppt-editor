@@ -1,6 +1,13 @@
-const PT_TO_PX = 96 / 72;
+import type { ElementFill, FillGradient } from './types'
 
-type FillMapping = { fill?: string; pattern?: string };
+const PT_TO_PX = 96 / 72;
+const EXPORTED_OBJECT_NAME_RE = /^(shape-text|shape|text)-(\d+)-(.+)$/
+
+export type ExportedObjectMeta = {
+  kind: 'shape-text' | 'shape' | 'text'
+  slideIndex: number
+  refId: string
+}
 
 export function toPx(value?: number | null): number | undefined {
   if (value === undefined || value === null) return undefined;
@@ -23,18 +30,110 @@ export function mapFillColor(value?: string | null): string | undefined {
   return value.startsWith("#") ? value : `#${value}`;
 }
 
-export function mapFill(fill: any): FillMapping {
-  if (!fill) return {};
-  if (typeof fill === "string") return { fill: mapFillColor(fill) ?? undefined };
-  if (typeof fill === "object") {
-    if (fill.type === "color" && typeof fill.value === "string") {
-      return { fill: mapFillColor(fill.value) ?? undefined };
-    }
-    if (fill.type === "image" && fill.value?.picBase64) {
-      return { fill: "", pattern: fill.value.picBase64 };
+export function parseExportedObjectName(name?: string | null): ExportedObjectMeta | undefined {
+  if (!name) return undefined
+
+  const match = name.match(EXPORTED_OBJECT_NAME_RE)
+  if (!match) return undefined
+
+  const slideIndex = Number.parseInt(match[2], 10)
+  if (!Number.isFinite(slideIndex)) return undefined
+
+  return {
+    kind: match[1] as ExportedObjectMeta['kind'],
+    slideIndex,
+    refId: match[3]
+  }
+}
+
+function parseGradientPosition(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value > 100 ? value / 1000 : value
+  }
+
+  if (typeof value !== 'string') return 0
+  const numeric = Number.parseFloat(value)
+  if (!Number.isFinite(numeric)) return 0
+  if (value.trim().endsWith('%')) return numeric
+  return numeric > 100 ? numeric / 1000 : numeric
+}
+
+function mapGradient(value: any): FillGradient | undefined {
+  if (!value || typeof value !== 'object') return undefined
+
+  const colors = Array.isArray(value.colors)
+    ? value.colors
+        .filter((stop) => stop && typeof stop === 'object')
+        .map((stop) => ({
+          pos: parseGradientPosition(stop.pos),
+          color: mapFillColor(stop.color) ?? '#FFFFFF'
+        }))
+    : []
+
+  return {
+    type:
+      typeof value.type === 'string'
+        ? value.type === 'line'
+          ? 'linear'
+          : value.type
+        : typeof value.path === 'string'
+        ? value.path === 'line'
+          ? 'linear'
+          : value.path
+        : 'linear',
+    rotate: typeof value.rotate === 'number' ? value.rotate : typeof value.rot === 'number' ? value.rot : 0,
+    colors
+  }
+}
+
+export function mapFill(fill: any): ElementFill | undefined {
+  if (!fill) return undefined
+  if (typeof fill === 'string') {
+    const color = mapFillColor(fill)
+    return color ? { type: 'solid', color } : undefined
+  }
+
+  if (typeof fill !== 'object') {
+    return undefined
+  }
+
+  if (fill.type === 'color' && typeof fill.value === 'string') {
+    const color = mapFillColor(fill.value)
+    return color ? { type: 'solid', color } : undefined
+  }
+
+  if (fill.type === 'solid' || (fill.type === undefined && typeof fill.color === 'string')) {
+    const color = mapFillColor(fill.color)
+    return color ? { type: 'solid', color } : undefined
+  }
+
+  if (fill.type === 'gradient') {
+    const gradient = mapGradient(fill.value ?? fill.gradient ?? fill)
+    return gradient ? { type: 'gradient', gradient } : undefined
+  }
+
+  if ((fill.type === 'image' || fill.type === 'pattern') && fill.value?.picBase64) {
+    return {
+      type: 'image',
+      src: fill.value.picBase64,
+      ...(typeof fill.value.opacity === 'number' ? { opacity: fill.value.opacity } : {})
     }
   }
-  return {};
+
+  if (fill.type === 'image' && typeof fill.src === 'string') {
+    return {
+      type: 'image',
+      src: fill.src,
+      ...(typeof fill.opacity === 'number' ? { opacity: fill.opacity } : {})
+    }
+  }
+
+  if (fill.gradient || fill.colors) {
+    const gradient = mapGradient(fill.gradient ?? fill)
+    return gradient ? { type: 'gradient', gradient } : undefined
+  }
+
+  return undefined
 }
 
 function convertFontSizeToPx(content: string): string {

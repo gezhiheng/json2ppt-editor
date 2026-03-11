@@ -1,3 +1,32 @@
+export type FillGradientStop = {
+  pos?: number
+  color?: string
+}
+
+export type FillGradient = {
+  type?: string
+  rotate?: number
+  colors?: FillGradientStop[]
+}
+
+export type SolidFill = {
+  type: 'solid'
+  color?: string
+}
+
+export type GradientFill = {
+  type: 'gradient'
+  gradient?: FillGradient
+}
+
+export type ImageFill = {
+  type: 'image'
+  src?: string
+  opacity?: number
+}
+
+export type ElementFill = SolidFill | GradientFill | ImageFill
+
 export type ElementShadow = {
   color?: string
   h?: number
@@ -47,7 +76,7 @@ export type TextElement = BaseElement<'text'> & {
   content?: string
   defaultFontName?: string
   defaultColor?: string
-  fill?: string
+  fill?: ElementFill
   wordSpace?: number
   lineHeight?: number
   paragraphSpace?: number
@@ -65,8 +94,7 @@ export type ShapeElement = BaseElement<'shape'> & {
   type: 'shape'
   path?: string
   viewBox?: [number, number]
-  fill?: string
-  pattern?: string
+  fill?: ElementFill
   text?: TextContent
 }
 
@@ -113,23 +141,32 @@ export type SlideElement =
   | LineElement
   | TableElement
 
-export type SlideBackground = {
-  color?: string
-}
+export type SlideBackground = ElementFill
 
 export type Slide = {
   background?: SlideBackground
   elements?: SlideElement[]
 }
 
-export type DeckTheme = {
+export type PresentationTheme = {
+  themeColors?: string[]
   fontName?: string
+  fontColor?: string
+  backgroundColor?: string
+  shadow?: ElementShadow
+  outline?: ElementOutline
 }
 
-export type Deck = {
+export type Presentation = {
   title?: string
   width?: number
   height?: number
   slides?: Slide[]
-  theme?: DeckTheme
+  theme?: PresentationTheme
 }
+
+export type PresentationData = Presentation
+
+export type DeckTheme = PresentationTheme
+
+export type Deck = Presentation

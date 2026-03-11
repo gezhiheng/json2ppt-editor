@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { applyCustomTheme } from '../src/lib/pptx-custom'
-import type { Deck } from '../src/types/ppt'
+import type { PresentationData } from '../src/types/ppt'
 
 function loadSlideFixture () {
   const raw = readFileSync('test/assets/json/debug-source-1.json', 'utf8')
@@ -13,7 +13,7 @@ function loadFontColorFixture () {
   return JSON.parse(raw)
 }
 
-function buildDeck (slide: unknown): Deck {
+function buildDeck (slide: unknown): PresentationData {
   return {
     slides: [slide],
     theme: {
@@ -23,7 +23,7 @@ function buildDeck (slide: unknown): Deck {
   }
 }
 
-function findElementContent (deck: Deck, id: string): string {
+function findElementContent (deck: PresentationData, id: string): string {
   const slide = deck.slides?.[0]
   const element = slide?.elements?.find(item => item?.id === id)
   return element?.content ?? ''

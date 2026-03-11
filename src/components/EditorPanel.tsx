@@ -204,7 +204,10 @@ function extractThemeFromDeck (deck: any): {
 
   for (const slide of slides) {
     if (backgroundColor) break
-    const normalized = normalizeColor(slide?.background?.color)
+    const normalized =
+      slide?.background?.type === 'solid'
+        ? normalizeColor(slide.background.color)
+        : undefined
     if (normalized) backgroundColor = normalized
   }
 

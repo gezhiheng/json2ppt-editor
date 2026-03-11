@@ -20,6 +20,8 @@ import type {
   V1Document,
   V1DocumentInput,
   V1Element,
+  V1Fill,
+  V1Gradient,
   V1ImageElement,
   V1LineElement,
   V1Outline,
@@ -32,6 +34,7 @@ import type {
 } from '../versions/v1/types'
 
 type UnknownRecord = Record<string, unknown>
+const TRANSPARENT_FILL = 'rgba(255,255,255,0)'
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -50,6 +53,10 @@ function asString(value: unknown, fallback: string): string {
 
 function asNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function asOptionalNumber(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined
 }
 
 function asBoolean(value: unknown, fallback: boolean): boolean {
@@ -106,27 +113,82 @@ function normalizeTheme(value: unknown): V1Theme {
   }
 }
 
+function normalizeGradient(value: unknown): V1Gradient | undefined {
+  if (!isRecord(value)) return undefined
+
+  const colors = Array.isArray(value.colors)
+    ? value.colors
+        .filter((stop): stop is UnknownRecord => isRecord(stop))
+        .map((stop) => ({
+          ...stop,
+          pos: asNumber(stop.pos, 0),
+          color: asString(stop.color, '#000000')
+        }))
+    : []
+
+  return {
+    ...value,
+    type: asString(value.type, 'linear'),
+    rotate: asNumber(value.rotate, 0),
+    colors
+  }
+}
+
+function normalizeFill(
+  value: unknown,
+  options: {
+    fallbackSolidColor?: string
+    required?: boolean
+  } = {}
+): V1Fill | undefined {
+  if (!isRecord(value)) {
+    if (!options.required) return undefined
+    return {
+      type: 'solid',
+      color: options.fallbackSolidColor ?? TRANSPARENT_FILL
+    }
+  }
+
+  if (value.type === 'gradient') {
+    return {
+      ...value,
+      type: 'gradient',
+      gradient:
+        normalizeGradient(value.gradient) ??
+        normalizeGradient(undefined) ?? {
+          type: 'linear',
+          rotate: 0,
+          colors: [
+            { pos: 0, color: options.fallbackSolidColor ?? TRANSPARENT_FILL },
+            { pos: 100, color: options.fallbackSolidColor ?? TRANSPARENT_FILL }
+          ]
+        }
+    }
+  }
+
+  if (value.type === 'image') {
+    return {
+      ...value,
+      type: 'image',
+      src: asString(value.src, ''),
+      ...(asOptionalNumber(value.opacity) === undefined
+        ? {}
+        : { opacity: asOptionalNumber(value.opacity) })
+    }
+  }
+
+  return {
+    ...value,
+    type: 'solid',
+    color: asString(value.color, options.fallbackSolidColor ?? TRANSPARENT_FILL)
+  }
+}
+
 function normalizeBackground(
   value: unknown,
   fallbackColor: string
 ): V1SlideBackground | undefined {
-  if (!isRecord(value)) return undefined
-
-  const type =
-    typeof value.type === 'string' && value.type.trim().length > 0
-      ? value.type
-      : 'solid'
-
-  const normalized: V1SlideBackground = {
-    ...value,
-    type
-  }
-
-  if (type === 'solid' && typeof normalized.color !== 'string') {
-    normalized.color = fallbackColor
-  }
-
-  return normalized
+  return normalizeFill(value, { fallbackSolidColor: fallbackColor })
 }
 
 function normalizeElement(
@@ -170,6 +232,7 @@ function normalizeElement(
       content: asString(value.content, ''),
       defaultColor: asString(value.defaultColor, theme.fontColor || DEFAULT_TEXT_COLOR),
       defaultFontName: asString(value.defaultFontName, theme.fontName),
+      fill: normalizeFill(value.fill),
       vertical: asBoolean(value.vertical, false)
     }
     return textElement
@@ -185,7 +248,10 @@ function normalizeElement(
       height,
       path: asString(value.path, ''),
       viewBox: asPair(value.viewBox, [width, height]),
-      fill: asString(value.fill, ''),
+      fill: normalizeFill(value.fill, {
+        fallbackSolidColor: TRANSPARENT_FILL,
+        required: true
+      }) as V1Fill,
       fixedRatio: asBoolean(value.fixedRatio, DEFAULT_SHAPE_FIXED_RATIO)
     }
     return shapeElement

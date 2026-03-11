@@ -8,13 +8,13 @@ import {
   hasMultiLineText,
   mapColor,
   mapFill,
-  mapFillColor,
   mapKeypoints,
   mapPathFormula,
   normalizeColor,
   normalizeTextContent,
   normalizeTextHeight,
   normalizeVAlign,
+  parseExportedObjectName,
   roundTo,
   toPx,
   toPxPair
@@ -22,9 +22,10 @@ import {
 
 export function mapElement(raw: any): SlideElement | null {
   if (!raw || !raw.type) return null;
-  const base = mapBaseElement(raw);
+  const exportedMeta = parseExportedObjectName(raw.name);
+  const base = mapBaseElement(raw, exportedMeta);
 
-  if (raw.type === "text") {
+  if (raw.type === "text" || isExportedTextShape(raw, exportedMeta)) {
     const content =
       raw.content !== undefined ? normalizeTextContent(raw.content) : raw.content;
     const fallbackLineHeight = hasMultiLineText(content) ? 1.5 : 1;
@@ -32,6 +33,7 @@ export function mapElement(raw: any): SlideElement | null {
     const normalizedHeight = normalizeTextHeight(base.height, content, lineHeight);
     return {
       ...base,
+      type: "text",
       height: normalizedHeight,
       rotate: base.rotate ?? 0,
       flipH: undefined,
@@ -43,7 +45,7 @@ export function mapElement(raw: any): SlideElement | null {
       lineHeight,
       paragraphSpace: raw.paragraphSpace,
       vertical: raw.isVertical,
-      fill: mapFill(raw.fill).fill ?? ""
+      fill: mapFill(raw.fill)
     };
   }
 
@@ -70,10 +72,12 @@ export function mapElement(raw: any): SlideElement | null {
   }
 
   if (raw.type === "shape") {
-    const { fill, pattern } = mapFill(raw.fill);
+    const fill = mapFill(raw.fill) ?? { type: "solid", color: "rgba(255,255,255,0)" };
     const pathFormula = mapPathFormula(raw.shapType);
     const keypoints = pathFormula ? mapKeypoints(pathFormula, raw.keypoints) : undefined;
-    const hasText = raw.content !== undefined;
+    const normalizedShapeText =
+      raw.content !== undefined ? normalizeTextContent(raw.content) : undefined;
+    const hasText = hasRenderableText(normalizedShapeText);
     let path = raw.path;
     let viewBox = raw.viewBox ?? [raw.width ?? 0, raw.height ?? 0];
     let special = false;
@@ -116,18 +120,18 @@ export function mapElement(raw: any): SlideElement | null {
 
     return {
       ...base,
+      type: "shape",
       rotate: base.rotate ?? 0,
       fixedRatio: false,
       path,
       viewBox,
       pathFormula: pathFormula ?? undefined,
       keypoints: keypoints ?? undefined,
-      pattern,
-      fill: fill ?? "",
+      fill,
       ...(special ? { special: true } : {}),
       text: hasText
         ? {
-            content: normalizeTextContent(raw.content),
+            content: normalizedShapeText,
             align: normalizeVAlign(raw.vAlign) ?? "middle",
             defaultColor: normalizeColor(raw.defaultColor) ?? normalizeColor(raw.color) ?? "#333",
             defaultFontName: raw.fontName ?? "",
@@ -140,6 +144,7 @@ export function mapElement(raw: any): SlideElement | null {
   if (raw.type === "line") {
     return {
       ...base,
+      type: "line",
       start: toPxPair(raw.start),
       end: toPxPair(raw.end),
       broken: toPxPair(raw.broken),
@@ -186,10 +191,6 @@ export function normalizeElement(element: SlideElement): SlideElement {
       color: element.outline.color,
       points: ["", ""]
     };
-  }
-
-  if (element.type === "shape" && element.fill) {
-    element.fill = mapFillColor(element.fill) ?? element.fill;
   }
 
   if (element.type === "text" && element.content) {
@@ -258,25 +259,41 @@ function mapOutline(raw: any): SlideElement["outline"] | undefined {
   };
 }
 
-function mapBaseElement(raw: any): SlideElement {
+function mapBaseElement(raw: any, exportedMeta?: ReturnType<typeof parseExportedObjectName>): SlideElement {
   const outline = mapOutline(raw);
   const shadow = mapShadow(raw.shadow);
-  const { fill } = mapFill(raw.fill);
+  const fill = mapFill(raw.fill);
+  const exportedId =
+    exportedMeta?.kind === "shape-text" ? `${exportedMeta.refId}__text` : exportedMeta?.refId;
 
   return {
     type: raw.type,
-    id: raw.id,
+    id: exportedId ?? raw.id,
     groupId: raw.groupId,
     left: toPx(raw.left),
     top: toPx(raw.top),
     width: toPx(raw.width),
     height: toPx(raw.height),
     rotate: raw.rotate,
-    fill: fill ?? undefined,
+    fill,
     opacity: raw.opacity,
     outline: outline ?? undefined,
     shadow: shadow ?? undefined,
     flipH: raw.isFlipH,
     flipV: raw.isFlipV
   };
+}
+
+function isExportedTextShape(
+  raw: any,
+  exportedMeta?: ReturnType<typeof parseExportedObjectName>
+): boolean {
+  if (raw?.type !== "shape" || !raw?.content) return false;
+  return exportedMeta?.kind === "text" || exportedMeta?.kind === "shape-text";
+}
+
+function hasRenderableText(content?: string): boolean {
+  if (!content) return false;
+  const plainText = content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  return plainText.length > 0;
 }

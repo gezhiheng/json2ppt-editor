@@ -71,4 +71,84 @@ describe('schema v1 parseDocument', () => {
     expect(parsed.schemaVersion).toBe('1.0.0')
     expect(parsed.slides[0].remark).toBe('')
   })
+
+  it('migrates legacy fill and background shapes into explicit fill unions', () => {
+    const parsed = parseDocument({
+      slides: [
+        {
+          background: {
+            type: 'solid',
+            color: '#FFFFFF',
+            gradient: {
+              type: 'linear',
+              rotate: 0,
+              colors: [
+                { pos: 0, color: '#FFFFFF' },
+                { pos: 100, color: '#DDDDDD' }
+              ]
+            }
+          },
+          elements: [
+            {
+              type: 'shape',
+              left: 0,
+              top: 0,
+              width: 100,
+              height: 100,
+              path: 'M 0 0 L 200 0 L 200 200 L 0 200 Z',
+              viewBox: [200, 200],
+              fill: '#FF0000'
+            },
+            {
+              type: 'shape',
+              left: 120,
+              top: 0,
+              width: 100,
+              height: 100,
+              path: 'M 0 0 L 200 0 L 200 200 L 0 200 Z',
+              viewBox: [200, 200],
+              fill: '#00FF00',
+              gradient: {
+                type: 'linear',
+                rotate: 45,
+                colors: [
+                  { pos: 0, color: '#00FF00' },
+                  { pos: 100, color: '#0000FF' }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    })
+
+    expect(parsed.slides[0].background).toEqual({
+      type: 'gradient',
+      gradient: {
+        type: 'linear',
+        rotate: 0,
+        colors: [
+          { pos: 0, color: '#FFFFFF' },
+          { pos: 100, color: '#DDDDDD' }
+        ]
+      }
+    })
+    expect(parsed.slides[0].elements[0]).toMatchObject({
+      type: 'shape',
+      fill: {
+        type: 'solid',
+        color: '#FF0000'
+      }
+    })
+    expect(parsed.slides[0].elements[1]).toMatchObject({
+      type: 'shape',
+      fill: {
+        type: 'gradient',
+        gradient: {
+          type: 'linear',
+          rotate: 45
+        }
+      }
+    })
+  })
 })

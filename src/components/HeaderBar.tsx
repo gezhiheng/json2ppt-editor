@@ -8,7 +8,7 @@ import {
   SelectValue
 } from './ui/select'
 import { Github, LayoutTemplate, Palette, RotateCcw } from 'lucide-react'
-import type { Deck } from '../types/ppt'
+import type { PresentationData } from '../types/ppt'
 import { ThemeModal } from './ThemeModal'
 import type { MediaScope, MediaScopeKey, ThemeMediaPayload } from './ThemeModal/types'
 import { cn } from '../lib/utils'
@@ -19,7 +19,7 @@ type TemplateEntry = {
 }
 
 type HeaderBarProps = {
-  deck: Deck | null
+  deck: PresentationData | null
   templates: TemplateEntry[]
   selectedTemplateId: string
   jsonError: string
@@ -187,7 +187,7 @@ export function HeaderBar ({
   )
 }
 
-function extractThemeMedia (deck: Deck): ThemeMediaPayload {
+function extractThemeMedia (deck: PresentationData): ThemeMediaPayload {
   const backgroundCandidates = collectMediaCandidates(deck, 'background')
   const logoCandidates = collectMediaCandidates(deck, 'logo')
 
@@ -219,7 +219,7 @@ function extractThemeMedia (deck: Deck): ThemeMediaPayload {
 }
 
 function collectMediaCandidates (
-  deck: Deck,
+  deck: PresentationData,
   imageType: 'background' | 'logo'
 ): Map<string, MediaCandidate> {
   const candidates = new Map<string, MediaCandidate>()

@@ -30,6 +30,48 @@ export type V1Gradient = {
   [key: string]: unknown
 }
 
+export type V1SolidFillInput = {
+  type?: 'solid'
+  color?: string
+  [key: string]: unknown
+}
+
+export type V1SolidFill = {
+  type: 'solid'
+  color: string
+  [key: string]: unknown
+}
+
+export type V1GradientFillInput = {
+  type: 'gradient'
+  gradient?: V1Gradient
+  [key: string]: unknown
+}
+
+export type V1GradientFill = {
+  type: 'gradient'
+  gradient: V1Gradient
+  [key: string]: unknown
+}
+
+export type V1ImageFillInput = {
+  type: 'image'
+  src?: string
+  opacity?: number
+  [key: string]: unknown
+}
+
+export type V1ImageFill = {
+  type: 'image'
+  src: string
+  opacity?: number
+  [key: string]: unknown
+}
+
+export type V1FillInput = V1SolidFillInput | V1GradientFillInput | V1ImageFillInput
+
+export type V1Fill = V1SolidFill | V1GradientFill | V1ImageFill
+
 export type V1ThemeInput = {
   themeColors?: string[]
   fontColor?: string
@@ -50,21 +92,9 @@ export type V1Theme = {
   [key: string]: unknown
 }
 
-export type V1SlideBackgroundInput = {
-  type?: string
-  color?: string
-  src?: string
-  gradient?: V1Gradient
-  [key: string]: unknown
-}
+export type V1SlideBackgroundInput = V1FillInput
 
-export type V1SlideBackground = {
-  type: string
-  color?: string
-  src?: string
-  gradient?: V1Gradient
-  [key: string]: unknown
-}
+export type V1SlideBackground = V1Fill
 
 export type V1ElementBaseInput<T extends string = string> = {
   type: T
@@ -105,7 +135,7 @@ export type V1TextElementInput = V1ElementBaseInput<'text'> & {
   content?: string
   defaultColor?: string
   defaultFontName?: string
-  fill?: string
+  fill?: V1FillInput
   lineHeight?: number
   paragraphSpace?: number
   textType?: string
@@ -119,7 +149,7 @@ export type V1TextElement = V1ElementBase<'text'> & {
   content: string
   defaultColor: string
   defaultFontName: string
-  fill?: string
+  fill?: V1Fill
   lineHeight?: number
   paragraphSpace?: number
   textType?: string
@@ -130,11 +160,10 @@ export type V1TextElement = V1ElementBase<'text'> & {
 export type V1ShapeElementInput = V1ElementBaseInput<'shape'> & {
   path?: string
   viewBox?: [number, number]
-  fill?: string
+  fill?: V1FillInput
   fixedRatio?: boolean
   keypoints?: number[]
   pathFormula?: string
-  gradient?: V1Gradient
   special?: boolean
   text?: V1ShapeText
 }
@@ -144,11 +173,10 @@ export type V1ShapeElement = V1ElementBase<'shape'> & {
   height: number
   path: string
   viewBox: [number, number]
-  fill: string
+  fill: V1Fill
   fixedRatio: boolean
   keypoints?: number[]
   pathFormula?: string
-  gradient?: V1Gradient
   special?: boolean
   text?: V1ShapeText
 }
@@ -266,3 +294,7 @@ export type V1Document = {
   slides: V1Slide[]
   [key: string]: unknown
 }
+
+export type PresentationDocumentInput = V1DocumentInput
+
+export type PresentationDocument = V1Document

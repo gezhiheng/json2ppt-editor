@@ -21,7 +21,7 @@ npm i pptx-custom
 - `applyCustomTheme(deck, themeInput)`
 
 Types are also exported, including:
-`CustomSlide`, `Deck`, `PptxCustomContentInput`, `PptxCustomThemeInput`,
+`CustomSlide`, `Presentation`, `PresentationData`, `PresentationTheme`, `PptxCustomContentInput`, `PptxCustomThemeInput`,
 `PptxCustomOptions`, `TemplateJson`, `TemplateJsonSlide`, `TemplateJsonElement`,
 `TemplateJsonTheme`.
 
@@ -129,3 +129,4 @@ Example NDJSON:
 - When both `backgroundImage` and `backgroundColor` are provided, background color is
   applied as a 50% alpha overlay color on targeted slides.
 - `clearBackgroundImage` also clears logo images in current behavior.
+- `Deck` remains available as a compatibility alias, but the recommended root type name is `Presentation`.
