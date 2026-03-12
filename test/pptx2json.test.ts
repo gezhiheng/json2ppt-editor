@@ -84,19 +84,19 @@ function firstSlideText(slide?: Slide): string {
 
 describe('pptx2json conversion', () => {
   it('converts template_1.pptx into schema-valid JSON', async () => {
-    const { deck, warnings } = await parsePptxToJson(createFixtureFile())
+    const { presentation, warnings } = await parsePptxToJson(createFixtureFile())
 
     expect(warnings).toEqual([])
-    expect(() => validateDocument(deck)).not.toThrow()
+    expect(() => validateDocument(presentation)).not.toThrow()
 
-    const parsed = parseDocument(deck)
+    const parsed = parseDocument(presentation)
     expect(parsed.schemaVersion).toBe('1.0.0')
     expect(parsed.slides.length).toBeGreaterThan(0)
   })
 
   it('matches template_1.json on structural conversion expectations', async () => {
     const expected = parseDocument(loadExpectedFixture()) as unknown as PresentationData
-    const { deck: actual } = await parsePptxToJson(createFixtureFile())
+    const { presentation: actual } = await parsePptxToJson(createFixtureFile())
 
     expect(() => validateDocument(expected)).not.toThrow()
     expect(() => validateDocument(actual)).not.toThrow()
@@ -185,14 +185,14 @@ describe('pptx2json conversion', () => {
 
     const blob = await createGeneratedBlob(source)
     const zip = await JSZip.loadAsync(await blob.arrayBuffer())
-    const { deck, warnings } = await parsePptxToJson(
+    const { presentation, warnings } = await parsePptxToJson(
       new File([blob], 'generated.pptx', { type: PPTX_MIME_TYPE })
     )
 
     expect(zip.file('json2ppt-editor.json')).toBeNull()
     expect(warnings).toEqual([])
-    expect(() => validateDocument(deck)).not.toThrow()
-    expect(parseDocument(deck).slides).toHaveLength(1)
+    expect(() => validateDocument(presentation)).not.toThrow()
+    expect(parseDocument(presentation).slides).toHaveLength(1)
   })
 
   it('round-trips exported visual primitives through native PPT XML', async () => {
@@ -256,14 +256,14 @@ describe('pptx2json conversion', () => {
     } satisfies PresentationData
 
     const { blob } = await createPPTX(source as any)
-    const { deck, warnings } = await parsePptxToJson(
+    const { presentation, warnings } = await parsePptxToJson(
       new File([blob], 'round-trip-primitives.pptx', { type: PPTX_MIME_TYPE })
     )
 
     expect(warnings).toEqual([])
-    expect(() => validateDocument(deck)).not.toThrow()
+    expect(() => validateDocument(presentation)).not.toThrow()
 
-    const slide = deck.slides[0]
+    const slide = presentation.slides[0]
     expect(slide.elements).toHaveLength(3)
 
     const textElement = slide.elements.find((element) => element.id === 'txt1')
