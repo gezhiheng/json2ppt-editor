@@ -21,7 +21,10 @@
     "pack:schema": "pnpm -C src/lib/json2pptx-schema pack",
     "publish:schema": "pnpm -C src/lib/json2pptx-schema publish --access public",
     "pack:ppt2json": "pnpm -C src/lib/pptx2json pack",
-    "publish:ppt2json": "pnpm -C src/lib/pptx2json publish --access public"
+    "publish:ppt2json": "pnpm -C src/lib/pptx2json publish --access public",
+    "release:plan": "node scripts/npm-publish.mjs plan",
+    "release:check": "node scripts/npm-publish.mjs check",
+    "release:publish": "node scripts/npm-publish.mjs publish"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
