@@ -1,7 +1,7 @@
 {
   "name": "json2ppt-editor",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "scripts": {
     "build:schema": "pnpm -C src/lib/json2pptx-schema build",

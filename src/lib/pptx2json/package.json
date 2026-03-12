@@ -1,6 +1,6 @@
 {
   "name": "ppt2json",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Convert PPTX files to json2pptx-compatible JSON decks.",
   "license": "MIT",
   "homepage": "https://json2pptx.henryge.com/",
@@ -41,7 +41,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "json2pptx-schema": "workspace:*",
+    "json2pptx-schema": "0.2.1",
     "jszip": "^3.10.1"
   },
   "devDependencies": {
