@@ -6,7 +6,8 @@
   "homepage": "https://json2pptx.henryge.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gezhiheng/json2ppt-editor/"
+    "url": "git+https://github.com/gezhiheng/json2pptx-editor.git",
+    "directory": "src/lib/pptx2json"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -124,6 +124,15 @@ function isExactVersion(value) {
   return semverPattern.test(value)
 }
 
+function normalizeRepositoryUrl(value) {
+  return String(value ?? '')
+    .trim()
+    .replace(/^git\+/, '')
+    .replace(/\.git$/, '')
+    .replace(/\/+$/, '')
+    .toLowerCase()
+}
+
 function runCommand(command, args, cwd) {
   const env = { ...process.env }
 
@@ -158,6 +167,9 @@ async function validatePackages(packages, releasePlan) {
   const releaseNames = new Set(releasePlan.map((pkg) => pkg.name))
   const warnings = []
   const errors = []
+  const expectedRepositoryUrl = process.env.GITHUB_REPOSITORY
+    ? normalizeRepositoryUrl(`https://github.com/${process.env.GITHUB_REPOSITORY}`)
+    : ''
 
   for (const pkg of releasePlan) {
     if (!pkg.name || !pkg.version) {
@@ -217,6 +229,15 @@ async function validatePackages(packages, releasePlan) {
             `${pkg.name}: ${depName} is pinned to ${depVersion}, while the workspace currently has ${localDep.version}. This package will publish against ${depVersion}.`
           )
         }
+      }
+    }
+
+    if (expectedRepositoryUrl) {
+      const actualRepositoryUrl = normalizeRepositoryUrl(pkg.manifest.repository?.url)
+      if (actualRepositoryUrl !== expectedRepositoryUrl) {
+        errors.push(
+          `${pkg.name}: repository.url resolves to "${pkg.manifest.repository?.url}", expected the current GitHub repository "${expectedRepositoryUrl}"`
+        )
       }
     }
   }
