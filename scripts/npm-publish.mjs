@@ -281,10 +281,40 @@ function printPlan(packages, releasePlan) {
 }
 
 async function buildAndPack(releasePlan) {
+  const packageMap = new Map((await loadPackages()).map((pkg) => [pkg.name, pkg]))
+  const releaseNames = new Set(releasePlan.map((pkg) => pkg.name))
+  const buildNames = new Set()
+
+  function includeBuildDependencies(pkg) {
+    if (buildNames.has(pkg.name)) {
+      return
+    }
+
+    buildNames.add(pkg.name)
+
+    for (const depName of getLocalDependencyNames(pkg, packageMap)) {
+      includeBuildDependencies(packageMap.get(depName))
+    }
+  }
+
   for (const pkg of releasePlan) {
+    includeBuildDependencies(pkg)
+  }
+
+  const buildPlan = Array.from(packageMap.values()).filter((pkg) => buildNames.has(pkg.name))
+
+  console.log('\nBuild order:')
+  for (const pkg of buildPlan) {
+    const role = releaseNames.has(pkg.name) ? 'release target' : 'local dependency'
+    console.log(`- ${pkg.name}@${pkg.version} [${role}]`)
+  }
+
+  for (const pkg of buildPlan) {
     console.log(`\nBuilding ${pkg.name}@${pkg.version}`)
     runCommand('pnpm', ['run', 'build'], pkg.dir)
+  }
 
+  for (const pkg of releasePlan) {
     console.log(`Packing ${pkg.name}@${pkg.version} (dry-run)`)
     runCommand('npm', ['pack', '--dry-run', '--json'], pkg.dir)
   }
