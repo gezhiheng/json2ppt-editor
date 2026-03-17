@@ -29,3 +29,12 @@
 
 - In each `src/lib/*` package, treat source folders (such as `src/`, `runtime/`, `versions/`, `parser/`, `type/`) as source of truth.
 - Do not hand-edit generated outputs under `dist/`.
+
+## Testing Rules
+
+- Root `./test` is reserved for integration tests that verify cross-package pipelines or broader app-level flows, typically involving two or three packages together.
+- Single-package edge cases and regression tests belong in that package's own `test/` or `tests/` directory.
+- Package-specific fixtures should live next to the owning package's tests, not under root `./test/assets`.
+
+## Commenting guideline
+Ensure generated comments explain the reasoning, intent, and design considerations behind the code, rather than merely restating its behavior.
