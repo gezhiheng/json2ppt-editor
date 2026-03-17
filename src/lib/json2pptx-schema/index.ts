@@ -46,6 +46,6 @@ export type {
   V1Theme,
   V1ThemeInput
 } from './versions/v1/types'
-export * from './type/fallback'
+export * from './types/fallback'
 
 export type { SchemaValidationIssue } from './runtime/errors'

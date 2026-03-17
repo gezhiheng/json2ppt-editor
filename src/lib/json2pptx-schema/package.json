@@ -1,6 +1,6 @@
 {
   "name": "json2pptx-schema",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Schema parsing pipeline for json2pptx documents (migrate -> validate -> normalize).",
   "license": "MIT",
   "homepage": "https://json2pptx.henryge.com/",
