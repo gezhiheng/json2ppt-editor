@@ -18,6 +18,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:packages-install": "vitest run --config vitest.install.config.ts",
     "pack:schema": "pnpm -C src/lib/json2pptx-schema pack",
     "publish:schema": "pnpm -C src/lib/json2pptx-schema publish --access public",
     "pack:ppt2json": "pnpm -C src/lib/pptx2json pack",
