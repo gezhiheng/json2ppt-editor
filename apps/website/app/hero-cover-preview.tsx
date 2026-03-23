@@ -2,7 +2,6 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { PPTXPreviewer } from 'pptx-previewer'
-import styles from './page.module.css'
 import { heroCoverSlide } from '../lib/hero-cover-slide'
 
 const PREVIEW_WIDTH = 1000
@@ -37,9 +36,9 @@ export function HeroCoverPreview () {
   }, [])
 
   return (
-    <div ref={frameRef} className={styles.previewRuntime}>
+    <div ref={frameRef} className='absolute inset-0'>
       <div
-        className={styles.previewCanvas}
+        className='origin-top-left will-change-transform'
         style={{
           width: PREVIEW_WIDTH,
           height: PREVIEW_HEIGHT,
