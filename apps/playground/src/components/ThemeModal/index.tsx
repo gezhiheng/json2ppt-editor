@@ -239,8 +239,8 @@ export function ThemeModal ({
         className='absolute inset-0 bg-ink-900/40 backdrop-blur-sm'
         onClick={isApplyingTheme ? undefined : onClose}
       />
-      <div className='relative my-0 flex max-h-[calc(100dvh-1.5rem)] w-full max-w-[860px] flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-2xl sm:my-4 sm:max-h-[90vh]'>
-        <div className='sticky top-0 z-10 flex items-center justify-between border-b border-ink-100 bg-white/90 px-4 py-3 backdrop-blur sm:px-6 sm:py-4'>
+      <div className='relative my-0 flex max-h-[calc(100dvh-1.5rem)] w-full max-w-215 flex-col overflow-hidden rounded-2xl border border-white/70 bg-white/95 shadow-2xl sm:my-4 sm:max-h-[90vh]'>
+        <div className='sticky top-0 z-10 flex items-center justify-between bg-white/90 px-4 py-3 backdrop-blur sm:px-6 sm:py-4'>
           <div>
             <h2 className='mt-1 font-display text-xl text-ink-900 sm:text-2xl'>
               Custom PPTX
@@ -322,7 +322,7 @@ export function ThemeModal ({
           </div>
         </div>
 
-        <div className='sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 border-t border-ink-100 bg-white/90 px-4 py-3 backdrop-blur sm:gap-3 sm:px-6 sm:py-4'>
+        <div className='sticky bottom-0 z-10 flex flex-wrap items-center justify-end gap-2 bg-white/90 px-4 py-3 backdrop-blur sm:gap-3 sm:px-6 sm:py-4'>
           <Button variant='ghost' onClick={onClose} disabled={isApplyingTheme}>
             Cancel
           </Button>
