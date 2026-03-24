@@ -115,8 +115,8 @@ function HomePageHero ({
 }) {
   return (
     <section className='grid min-h-[calc(100svh-118px)] grid-cols-[minmax(0,0.95fr)_minmax(420px,0.98fr)] items-center gap-[clamp(40px,5vw,76px)] py-[34px] pb-28 max-[1180px]:grid-cols-1 min-[761px]:max-[1180px]:min-h-0 min-[761px]:max-[1180px]:justify-items-center min-[761px]:max-[1180px]:gap-14 min-[761px]:max-[1180px]:py-8 min-[761px]:max-[1180px]:pb-24 max-[760px]:min-h-0 max-[760px]:py-[18px] max-[760px]:pb-[86px]'>
-      <div className='animate-rise-in min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-[860px] min-[761px]:max-[1180px]:text-center'>
-        <h1 className='mt-5.5 max-w-[7.2ch] font-sans text-[clamp(3.9rem,8vw,6.7rem)] leading-[0.92] font-black tracking-[-0.05em] text-home-ink-strong break-keep min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-[9.4ch] min-[761px]:max-[1180px]:text-[clamp(3.15rem,9vw,5rem)] min-[761px]:max-[1180px]:leading-[0.94] max-[760px]:text-[clamp(2.8rem,14vw,4.25rem)] max-[560px]:text-[clamp(2.34rem,13.2vw,3.3rem)] max-[560px]:leading-[0.96]'>
+      <div className='animate-rise-in min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-215 min-[761px]:max-[1180px]:text-center'>
+        <h1 className='mt-5.5 max-w-[7.2ch] font-sans text-[clamp(3.9rem,8vw,6.7rem)] leading-[0.93] font-extrabold tracking-[-0.042em] text-home-ink break-keep min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-[9.4ch] min-[761px]:max-[1180px]:text-[clamp(3.15rem,9vw,5rem)] min-[761px]:max-[1180px]:leading-[0.95] max-[760px]:text-[clamp(2.8rem,14vw,4.25rem)] max-[560px]:text-[clamp(2.34rem,13.2vw,3.3rem)] max-[560px]:leading-[0.97]'>
           结构优先
           <br />
           <span className='inline-flex items-center gap-[0.18em] whitespace-nowrap max-[560px]:gap-[0.14em]'>
@@ -149,8 +149,8 @@ function HomePageHero ({
 
 function HomePageFeatures () {
   return (
-    <section className='scroll-mt-[110px] pb-36 max-[760px]:pb-28' id='features'>
-      <div className='mx-auto mb-[52px] max-w-[760px] text-center'>
+    <section className='scroll-mt-27.5 pb-36 max-[760px]:pb-28' id='features'>
+      <div className='mx-auto mb-13 max-w-190 text-center'>
         <h2 className='font-sans text-[clamp(2.35rem,4vw,4.2rem)] leading-[1.02] font-black tracking-[-0.05em] text-home-ink [word-break:keep-all]'>
           把 PPT 纳入工程体系
         </h2>
@@ -164,7 +164,7 @@ function HomePageFeatures () {
           className='col-span-8 max-[1180px]:col-span-12'
           tone='slate'
           icon='terminal'
-          title='核心能力拆包，组合更自由'
+          title='核心能力拆包 组合更自由'
           titleClassName='max-w-[14ch] text-[clamp(1.7rem,2.6vw,2.8rem)]'
           body={
             <>
@@ -228,7 +228,7 @@ function HomePageFeatures () {
 
 function FeatureModulesVisual () {
   return (
-    <div className='rounded-[28px] border border-[rgba(217,210,199,0.92)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(246,242,236,0.94))] p-5 shadow-panel'>
+    <div className='rounded-[28px] border border-[rgba(217,210,199,0.92)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(246,242,236,0.94))] p-5'>
       <div className='mt-5 grid gap-3 min-[1040px]:grid-cols-5 min-[620px]:grid-cols-2'>
         {packagePills.map((item) => {
           const meta = packageFeatureMeta[item.name]
@@ -249,7 +249,7 @@ function FeatureModulesVisual () {
               <span className='mt-2 block text-[0.77rem] leading-[1.65] text-home-copy'>
                 {meta.detail}
               </span>
-              <span className={cx('mt-4 block h-0.75 w-13.5 rounded-full bg-gradient-to-r transition duration-200 group-hover:w-[72px]', meta.accentClassName)} aria-hidden='true' />
+              <span className={cx('mt-4 block h-0.75 w-13.5 rounded-full bg-linear-to-r transition duration-200 group-hover:w-18', meta.accentClassName)} aria-hidden='true' />
             </HomePageLink>
           )
         })}
@@ -261,7 +261,7 @@ function FeatureModulesVisual () {
 function FeatureRoundTripVisual () {
   return (
     <div
-      className='rounded-3xl border border-[rgba(217,210,199,0.92)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,244,239,0.94))] p-4 shadow-panel'
+      className='rounded-3xl border border-[rgba(217,210,199,0.92)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(247,244,239,0.94))] p-4'
       aria-hidden='true'
     >
       <div className='grid items-center gap-3 min-[561px]:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]'>
@@ -270,10 +270,10 @@ function FeatureRoundTripVisual () {
             <span>PPTX</span>
             <span>Slide</span>
           </div>
-          <div className='mt-3 rounded-[16px] bg-[rgba(224,108,97,0.06)] p-3'>
+          <div className='mt-3 rounded-2xl bg-[rgba(224,108,97,0.06)] p-3'>
             <span className='block h-2.5 w-[72%] rounded-full bg-[rgba(79,70,63,0.18)]' />
             <div className='mt-3 grid grid-cols-[1.05fr_0.95fr] gap-2.5'>
-              <span className='h-18 rounded-[12px] bg-[linear-gradient(160deg,rgba(224,108,97,0.28),rgba(255,255,255,0.7))]' />
+              <span className='h-18 rounded-xl bg-[linear-gradient(160deg,rgba(224,108,97,0.28),rgba(255,255,255,0.7))]' />
               <div className='space-y-2'>
                 <span className='block h-2.5 w-full rounded-full bg-[rgba(224,108,97,0.34)]' />
                 <span className='block h-2.5 w-[84%] rounded-full bg-[rgba(79,70,63,0.12)]' />
@@ -425,7 +425,7 @@ function HomePageWorkflow () {
           <article key={item.step} className='relative px-4 text-center max-[560px]:px-0'>
             <div
               className={cx(
-                'relative z-[1] mx-auto mb-[18px] grid h-14 w-14 place-items-center rounded-[18px] border border-white/88 bg-white/82 font-display text-base font-extrabold text-home-ink shadow-panel',
+                'relative z-[1] mx-auto mb-[18px] grid h-14 w-14 place-items-center rounded-[18px] border border-white/88 bg-white/82 font-display text-base font-extrabold text-home-ink',
                 item.step === '2' && 'text-home-slate',
                 item.step === '3' && 'border-transparent bg-[linear-gradient(135deg,rgba(224,108,97,0.92),rgba(61,77,179,0.88))] text-white'
               )}

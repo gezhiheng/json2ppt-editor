@@ -14,6 +14,10 @@ const featureIconClassNames: Record<FeatureTone, string> = {
   ember: 'text-home-ember',
   slate: 'text-home-slate'
 }
+const featureIconFrameClassNames: Record<FeatureTone, string> = {
+  ember: 'border-[rgba(224,108,97,0.34)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,244,241,0.92))] shadow-[0_0_0_1px_rgba(224,108,97,0.12),0_14px_28px_rgba(224,108,97,0.14)]',
+  slate: 'border-[rgba(61,77,179,0.3)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,245,255,0.92))] shadow-[0_0_0_1px_rgba(61,77,179,0.12),0_14px_28px_rgba(61,77,179,0.14)]'
+}
 
 export const containerClass = 'mx-auto w-full max-w-[1360px] px-6 max-[920px]:px-[14px]'
 export const pillClass = 'inline-flex min-h-[30px] items-center rounded-full border border-[rgba(217,210,199,0.9)] bg-white/70 px-3 text-[0.76rem] font-bold tracking-[0.08em] text-home-muted'
@@ -199,7 +203,7 @@ export function FeatureCard ({
         aria-hidden='true'
       />
       <div className='relative z-10 flex h-full flex-col'>
-        <div className={cx('inline-grid h-12 w-12 place-items-center rounded-2xl border border-white/88 bg-white/80 shadow-panel [&>svg]:h-6 [&>svg]:w-6', featureIconClassNames[tone])}>
+        <div className={cx('inline-grid h-12 w-12 place-items-center rounded-2xl border [&>svg]:h-6 [&>svg]:w-6', featureIconClassNames[tone], featureIconFrameClassNames[tone])}>
           <FeatureIcon name={icon} />
         </div>
         <h3 className={cx('mt-4 font-sans leading-[1.02] font-black tracking-[-0.05em] text-home-ink break-keep', titleClassName)}>
