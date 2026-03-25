@@ -18,7 +18,8 @@ const packageDirs = [
   'packages/json2pptx',
   'packages/pptx-custom',
   'packages/pptx-previewer',
-  'packages/pptx2json'
+  'packages/pptx2json',
+  'packages/pipto'
 ]
 const dependencySections = ['dependencies', 'optionalDependencies', 'peerDependencies']
 const semverPattern = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/

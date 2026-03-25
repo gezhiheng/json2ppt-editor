@@ -6,3 +6,4 @@ packages:
   - 'packages/pptx2json'
   - 'packages/pptx-previewer'
   - 'packages/pptx-custom'
+  - 'packages/pipto'

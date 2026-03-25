@@ -191,6 +191,7 @@ function getTarballFileName (pkg: WorkspacePackage): string {
 function getExtraInstallPackages (pkg: WorkspacePackage): string[] {
   switch (pkg.name) {
     case 'pptx-previewer':
+    case '@henryge/pipto':
       return ['react@19.2.4', 'react-dom@19.2.4']
     default:
       return []
@@ -314,6 +315,85 @@ const markup = renderToStaticMarkup(
 )
 
 assert.ok(markup.includes('Hello smoke'))
+`
+
+    case '@henryge/pipto':
+      return `
+import assert from 'node:assert/strict'
+import { File } from 'node:buffer'
+import { readFile } from 'node:fs/promises'
+import React from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import {
+  DEFAULT_SCHEMA_VERSION,
+  applyCustomTheme,
+  createPPTX,
+  importPPTXPreviewer,
+  parseDocument
+} from '@henryge/pipto'
+import { parsePptxToJson } from '@henryge/pipto/ppt2json'
+import { parseCustomContent } from '@henryge/pipto/pptx-custom'
+
+const parsed = parseDocument({
+  title: 'Umbrella Smoke',
+  theme: {},
+  slides: [{ elements: [] }]
+})
+
+assert.equal(parsed.schemaVersion, DEFAULT_SCHEMA_VERSION)
+
+const { blob, fileName } = await createPPTX({
+  title: 'Umbrella Smoke',
+  theme: {},
+  slides: [{ elements: [] }]
+})
+
+assert.ok(blob instanceof Blob)
+assert.equal(fileName, 'Umbrella Smoke.pptx')
+
+const fixture = await readFile(${JSON.stringify(pptxFixturePath)})
+const file = new File([fixture], 'template_1.pptx', { type: ${JSON.stringify(PPTX_MIME_TYPE)} })
+const { presentation } = await parsePptxToJson(file)
+
+assert.ok((presentation.slides?.length ?? 0) > 0)
+assert.equal(parseCustomContent(JSON.stringify([{ type: 'end' }])).length, 1)
+assert.equal(
+  applyCustomTheme(
+    {
+      title: 'Theme Smoke',
+      theme: {
+        themeColors: ['#111111'],
+        fontColor: '#111111'
+      },
+      slides: [{ elements: [] }]
+    },
+    {
+      themeColors: ['#222222'],
+      fontColor: '#222222'
+    }
+  ).theme?.fontColor,
+  '#222222'
+)
+
+const { PPTXPreviewer } = await importPPTXPreviewer()
+const markup = renderToStaticMarkup(
+  React.createElement(PPTXPreviewer, {
+    slide: {
+      elements: [
+        {
+          type: 'text',
+          left: 0,
+          top: 0,
+          width: 320,
+          height: 40,
+          content: '<p>Hello umbrella</p>'
+        }
+      ]
+    }
+  })
+)
+
+assert.ok(markup.includes('Hello umbrella'))
 `
 
     default:

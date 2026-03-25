@@ -1,0 +1,112 @@
+{
+  "name": "@henryge/pipto",
+  "version": "0.1.0",
+  "description": "Unified entrypoint for Pipto schema, export, import, preview, and customization packages.",
+  "license": "MIT",
+  "homepage": "https://pipto.henryge.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gezhiheng/pipto.git",
+    "directory": "packages/pipto"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./json2pptx-schema": {
+      "types": "./dist/json2pptx-schema.d.ts",
+      "import": "./dist/json2pptx-schema.mjs",
+      "require": "./dist/json2pptx-schema.js",
+      "default": "./dist/json2pptx-schema.mjs"
+    },
+    "./json2pptx": {
+      "types": "./dist/json2pptx.d.ts",
+      "import": "./dist/json2pptx.mjs",
+      "require": "./dist/json2pptx.js",
+      "default": "./dist/json2pptx.mjs"
+    },
+    "./ppt2json": {
+      "types": "./dist/ppt2json.d.ts",
+      "import": "./dist/ppt2json.mjs",
+      "require": "./dist/ppt2json.js",
+      "default": "./dist/ppt2json.mjs"
+    },
+    "./pptx-custom": {
+      "types": "./dist/pptx-custom.d.ts",
+      "import": "./dist/pptx-custom.mjs",
+      "require": "./dist/pptx-custom.js",
+      "default": "./dist/pptx-custom.mjs"
+    },
+    "./pptx-previewer": {
+      "types": "./dist/pptx-previewer.d.ts",
+      "import": "./dist/pptx-previewer.mjs",
+      "require": "./dist/pptx-previewer.js",
+      "default": "./dist/pptx-previewer.mjs"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "json2pptx-schema": [
+        "dist/json2pptx-schema.d.ts"
+      ],
+      "json2pptx": [
+        "dist/json2pptx.d.ts"
+      ],
+      "ppt2json": [
+        "dist/ppt2json.d.ts"
+      ],
+      "pptx-custom": [
+        "dist/pptx-custom.d.ts"
+      ],
+      "pptx-previewer": [
+        "dist/pptx-previewer.d.ts"
+      ],
+      "*": [
+        "dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev:watch": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm run build"
+  },
+  "dependencies": {
+    "json2pptx": "0.5.5",
+    "json2pptx-schema": "0.2.4",
+    "ppt2json": "0.3.5",
+    "pptx-custom": "0.5.4",
+    "pptx-previewer": "0.3.4"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}
