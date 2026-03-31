@@ -18,11 +18,6 @@ export default defineConfig({
     locale: 'en-US',
     colorScheme: 'light'
   },
-  launchOptions: {
-    env: {
-      NO_PROXY: '127.0.0.1,localhost'
-    }
-  },
   webServer: {
     command: 'PORT=4173 pnpm dev',
     cwd: path.resolve(__dirname),
