@@ -1,7 +1,8 @@
 @import 'fumadocs-ui/style.css';
 
 body:has(#nd-docs-layout) {
-  background-color: #f4f0ea;
+  --docs-surface: #f4f0ea;
+  background-color: var(--docs-surface);
   background-image: none;
 }
 
@@ -10,7 +11,6 @@ body:has(#nd-docs-layout)::before {
 }
 
 #nd-docs-layout {
-  --docs-surface: #f4f0ea;
   --color-fd-background: hsl(33 31% 94%);
   --color-fd-foreground: hsl(25 18% 12%);
   --color-fd-muted: hsla(28 27% 98% / 0.74);
@@ -28,7 +28,7 @@ body:has(#nd-docs-layout)::before {
   --color-fd-accent-foreground: hsl(7 65% 36%);
   --color-fd-ring: hsl(7 65% 48%);
   min-height: 100vh;
-  background: #f4f0ea;
+  background: var(--docs-surface);
 }
 
 #nd-sidebar,
@@ -76,6 +76,15 @@ body:has(#nd-docs-layout)::before {
   backdrop-filter: none !important;
 }
 
+header[role='banner'] {
+  background: var(--docs-surface);
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
 #nd-sidebar [data-radix-scroll-area-viewport],
 #nd-toc [data-radix-scroll-area-viewport],
 #nd-toc > div > div {
@@ -107,15 +116,42 @@ body:has(#nd-docs-layout)::before {
   border-radius: 20px;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 992px) {
   #nd-subnav,
   #nd-tocnav {
-    background: rgba(244, 240, 234, 0.76) !important;
-    backdrop-filter: blur(18px);
+    background: var(--docs-surface) !important;
+    backdrop-filter: none;
   }
 
   #nd-subnav > div,
   #nd-tocnav > div {
     background: transparent;
+  }
+
+  header[role='banner'],
+  #nd-subnav {
+    background: var(--docs-surface);
+  }
+
+  header[role='banner'] {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  /* Tighten the gap so the mobile sub-nav overlaps the outline edge */
+  #nd-subnav {
+    margin-top: 0rem;
+    margin-bottom: -4rem;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+  }
+
+  #nd-tocnav {
+    background: var(--docs-surface);
+  }
+
+  #nd-tocnav button {
+    display: none;
   }
 }
