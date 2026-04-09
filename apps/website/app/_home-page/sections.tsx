@@ -302,7 +302,7 @@ function FeaturePreviewVisual () {
     <div className='rounded-[18px] border border-[rgba(217,210,199,0.82)] bg-white/88 p-4'>
       <span className='block h-3 w-[46%] rounded-full bg-[rgba(79,70,63,0.2)]' />
       <div className='mt-4 grid grid-cols-[1.04fr_0.96fr] gap-3'>
-        <span className='h-20 rounded-[14px] bg-[linear-gradient(165deg,rgba(61,77,179,0.24),rgba(255,255,255,0.92))]' />
+        <span className='h-28 rounded-[14px] bg-[linear-gradient(165deg,rgba(61,77,179,0.24),rgba(255,255,255,0.92))]' />
         <div className='space-y-2.5'>
           <span className='block h-2.5 w-full rounded-full bg-[rgba(79,70,63,0.14)]' />
           <span className='block h-2.5 w-[84%] rounded-full bg-[rgba(61,77,179,0.28)]' />
