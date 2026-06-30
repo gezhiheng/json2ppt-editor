@@ -119,12 +119,12 @@ export function HomePageHeroVisual () {
   return (
     <div
       ref={frameRef}
-      className='animate-[rise_0.7s_ease-out_80ms_both] relative min-h-[560px] [perspective:1400px] min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:w-full min-[761px]:max-[1180px]:max-w-[900px] min-[761px]:max-[1180px]:min-h-[480px] max-[760px]:min-h-[540px] max-[560px]:min-h-[500px]'
+      className='animate-[rise_0.7s_ease-out_80ms_both] relative min-h-[560px] [perspective:1400px] min-[1600px]:min-h-[640px] min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:w-full min-[761px]:max-[1180px]:max-w-[900px] min-[761px]:max-[1180px]:min-h-[480px] max-[760px]:min-h-[540px] max-[560px]:min-h-[500px]'
       aria-label='封面 JSON 与预览'
     >
       <div
         ref={hostRef}
-        className='relative min-h-[560px] [transform-style:preserve-3d] will-change-transform transition-[transform] duration-200 ease-out min-[761px]:max-[1180px]:min-h-[480px] max-[760px]:min-h-[540px] max-[560px]:min-h-[500px]'
+        className='relative min-h-[560px] [transform-style:preserve-3d] will-change-transform transition-[transform] duration-200 ease-out min-[1600px]:min-h-[640px] min-[761px]:max-[1180px]:min-h-[480px] max-[760px]:min-h-[540px] max-[560px]:min-h-[500px]'
         style={{
           transform: 'rotateX(var(--hero-rotate-x, 0deg)) rotateY(var(--hero-rotate-y, 0deg)) translate3d(0, var(--hero-lift, 0px), 0) scale(var(--hero-scale, 1))'
         }}
@@ -132,7 +132,7 @@ export function HomePageHeroVisual () {
         <div
           className={cx(
             glassPanelClass,
-            'absolute left-0 top-0 w-[min(436px,78%)] rounded-[30px] p-[22px] pb-6 min-[761px]:max-[1180px]:left-3 min-[761px]:max-[1180px]:w-[min(488px,58%)] min-[761px]:max-[1180px]:rounded-[28px] min-[761px]:max-[1180px]:p-5 min-[761px]:max-[1180px]:pb-5 max-[760px]:w-full max-[560px]:rounded-[24px] max-[560px]:p-[18px]'
+            'absolute left-0 top-0 w-[min(436px,78%)] rounded-[30px] p-[22px] pb-6 min-[1600px]:w-[min(520px,72%)] min-[1600px]:p-6 min-[761px]:max-[1180px]:left-3 min-[761px]:max-[1180px]:w-[min(488px,58%)] min-[761px]:max-[1180px]:rounded-[28px] min-[761px]:max-[1180px]:p-5 min-[761px]:max-[1180px]:pb-5 max-[760px]:w-full max-[560px]:rounded-[24px] max-[560px]:p-[18px]'
           )}
           style={{ transform: 'translate3d(0, 0, 18px)' }}
         >
@@ -151,7 +151,7 @@ export function HomePageHeroVisual () {
         <div
           className={cx(
             glassPanelClass,
-            'absolute bottom-0 right-0 w-[min(490px,84%)] rounded-[30px] p-4 min-[761px]:max-[1180px]:right-3 min-[761px]:max-[1180px]:w-[min(520px,62%)] min-[761px]:max-[1180px]:rounded-[28px] min-[761px]:max-[1180px]:p-3.5 max-[760px]:w-[calc(100%-20px)] max-[560px]:rounded-[24px] max-[560px]:p-3'
+            'absolute bottom-0 right-0 w-[min(490px,84%)] rounded-[30px] p-4 min-[1600px]:w-[min(620px,80%)] min-[1600px]:p-5 min-[761px]:max-[1180px]:right-3 min-[761px]:max-[1180px]:w-[min(520px,62%)] min-[761px]:max-[1180px]:rounded-[28px] min-[761px]:max-[1180px]:p-3.5 max-[760px]:w-[calc(100%-20px)] max-[560px]:rounded-[24px] max-[560px]:p-3'
           )}
           style={{ transform: 'translate3d(0, 0, 42px)' }}
         >

@@ -19,7 +19,7 @@ const featureIconFrameClassNames: Record<FeatureTone, string> = {
   slate: 'border-[rgba(61,77,179,0.3)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(243,245,255,0.92))] shadow-[0_0_0_1px_rgba(61,77,179,0.12),0_14px_28px_rgba(61,77,179,0.14)]'
 }
 
-export const containerClass = 'mx-auto w-full max-w-[1360px] px-6 max-[920px]:px-[14px]'
+export const containerClass = 'mx-auto w-full max-w-[1360px] px-6 min-[1600px]:max-w-[1680px] min-[1600px]:px-10 max-[920px]:px-[14px]'
 export const pillClass = 'inline-flex min-h-[30px] items-center rounded-full border border-[rgba(217,210,199,0.9)] bg-white/70 px-3 text-[0.76rem] font-bold tracking-[0.08em] text-home-muted'
 export const glassPanelClass = 'border border-line bg-paper shadow-panel backdrop-blur-[20px]'
 export const primaryButtonClass = 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-ember-500 px-6 text-[0.95rem] font-bold text-white shadow-cta transition duration-200 hover:-translate-y-0.5 hover:bg-ember-400'

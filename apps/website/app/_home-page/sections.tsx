@@ -114,7 +114,7 @@ function HomePageHero ({
   playgroundHref: string
 }) {
   return (
-    <section className='grid min-h-[calc(100svh-118px)] grid-cols-[minmax(0,0.95fr)_minmax(420px,0.98fr)] items-center gap-[clamp(40px,5vw,76px)] py-[34px] pb-28 max-[1180px]:grid-cols-1 min-[761px]:max-[1180px]:min-h-0 min-[761px]:max-[1180px]:justify-items-center min-[761px]:max-[1180px]:gap-14 min-[761px]:max-[1180px]:py-8 min-[761px]:max-[1180px]:pb-24 max-[760px]:min-h-0 max-[760px]:py-[18px] max-[760px]:pb-[86px]'>
+    <section className='grid min-h-[min(880px,calc(100svh-118px))] grid-cols-[minmax(0,0.95fr)_minmax(420px,0.98fr)] items-center gap-[clamp(40px,5vw,76px)] py-[34px] pb-28 min-[1600px]:grid-cols-[minmax(0,0.82fr)_minmax(680px,1fr)] min-[1600px]:gap-[clamp(56px,6vw,120px)] max-[1180px]:grid-cols-1 min-[761px]:max-[1180px]:min-h-0 min-[761px]:max-[1180px]:justify-items-center min-[761px]:max-[1180px]:gap-14 min-[761px]:max-[1180px]:py-8 min-[761px]:max-[1180px]:pb-24 max-[760px]:min-h-0 max-[760px]:py-[18px] max-[760px]:pb-[86px]'>
       <div className='animate-rise-in min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-215 min-[761px]:max-[1180px]:text-center'>
         <h1 className='mt-5.5 max-w-[7.2ch] font-sans text-[clamp(3.9rem,8vw,6.7rem)] leading-[0.93] font-extrabold tracking-[-0.042em] text-home-ink break-keep min-[761px]:max-[1180px]:mx-auto min-[761px]:max-[1180px]:max-w-[9.4ch] min-[761px]:max-[1180px]:text-[clamp(3.15rem,9vw,5rem)] min-[761px]:max-[1180px]:leading-[0.95] max-[760px]:text-[clamp(2.8rem,14vw,4.25rem)] max-[560px]:text-[clamp(2.34rem,13.2vw,3.3rem)] max-[560px]:leading-[0.97]'>
           结构优先
