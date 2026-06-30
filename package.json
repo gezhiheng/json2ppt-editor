@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Pipto is a JSON-native presentation workspace with a marketing website, an interactive playground, and publishable packages for schema validation, PPTX export/import, preview, and theme transforms.",
+  "packageManager": "pnpm@10.23.0",
   "type": "module",
   "scripts": {
     "build:schema": "pnpm -C packages/json2pptx-schema build",
