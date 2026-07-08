@@ -1,10 +1,9 @@
+import { HomePageHeader } from './home-page-header'
 import { HomePageHeroVisual } from './home-page-hero-visual'
 import {
   createFooterLinks,
   docsHref,
-  navLinks,
   packagePills,
-  repositoryHref,
   type HomePageLinkItem,
   workflowSteps
 } from './content'
@@ -79,32 +78,6 @@ export function HomePageContent ({
 
       <HomePageFooter links={createFooterLinks(playgroundHref)} />
     </>
-  )
-}
-
-function HomePageHeader () {
-  return (
-    <header className='sticky top-0 z-40 backdrop-blur-[18px]'>
-      <div className={cx(containerClass, 'flex min-h-[92px] items-center justify-between gap-6 max-[760px]:min-h-0 max-[760px]:flex-wrap max-[760px]:py-4')}>
-        <HomePageLink className='inline-flex items-center gap-3 text-home-ink-strong' href='/'>
-          <img className='h-9 w-9 shrink-0' src='/favicon.svg' alt='' aria-hidden='true' />
-          <span className='font-display text-[1.1rem] font-extrabold'>Pipto</span>
-        </HomePageLink>
-
-        <nav className='flex items-center gap-7 text-[0.95rem] font-semibold text-home-copy max-[920px]:hidden' aria-label='主导航'>
-          {navLinks.map((item) => (
-            <HomePageLink
-              key={item.label}
-              className='transition duration-150 hover:text-home-ember'
-              href={item.href}
-              external={item.external}
-            >
-              {item.label}
-            </HomePageLink>
-          ))}
-        </nav>
-      </div>
-    </header>
   )
 }
 
